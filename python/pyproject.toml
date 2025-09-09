@@ -1,0 +1,18 @@
+[project]
+name = "brain"
+version = "0.0.1"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "black", "mypy"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
