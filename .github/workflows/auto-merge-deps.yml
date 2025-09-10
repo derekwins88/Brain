@@ -1,0 +1,45 @@
+name: auto-merge-dependabot
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  auto-merge:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require green checks
+        uses: actions/github-script@v7
+        id: status
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const { data: combined } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: pr.head.sha
+            });
+            const names = combined.check_runs.map(c => c.name);
+            const must = ["CI - Python","CI - .NET"];
+            core.info(`Checks seen: ${names.join(", ")}`);
+            const missing = must.filter(m => !names.includes(m));
+            if (missing.length) core.setFailed(`Missing required checks: ${missing.join(", ")}`);
+            const failed = combined.check_runs.filter(c => c.conclusion && c.conclusion !== "success");
+            if (failed.length) core.setFailed(`Some checks failed: ${failed.map(f => f.name).join(", ")}`);
+
+      - name: Enable auto-merge
+        if: ${{ success() }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              merge_method: "squash"
+            });
+            core.info("Squash-merged Dependabot PR because all required checks passed.")
