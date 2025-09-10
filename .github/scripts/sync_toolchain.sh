@@ -1,24 +1,65 @@
 #!/usr/bin/env bash
-# Sync project's lean-toolchain with Mathlib's pinned toolchain (idempotent).
-# - Ensures 'lake' exists (installs elan if missing, when possible).
-# - Runs 'lake update' to materialize mathlib toolchain if needed.
-# - Copies mathlib's toolchain to project root only when different.
+# Sync project's lean-toolchain with Mathlib's pinned toolchain.
+# Strategy:
+#  1) Parse Mathlib `rev` from Lake.toml and curl that commit's `lean-toolchain`.
+#     (Avoids running `lake update`, so no cache/toolchain mismatch explosions.)
+#  2) If curl path fails (no rev / no network), fall back to `elan`+`lake update || true`
+#     and then copy `.lake/packages/mathlib/lean-toolchain` if present.
+# Idempotent and safe for CI/local.
 
 set -euo pipefail
 
 PKG_DIR="${1:-lean}"
-MATHLIB_TC_REL=".lake/packages/mathlib/lean-toolchain"
-PROJECT_TC_REL="lean-toolchain"
+LAKE_TOML="$PKG_DIR/Lake.toml"
+PROJECT_TC="$PKG_DIR/lean-toolchain"
 
 if [[ ! -d "$PKG_DIR" ]]; then
   echo "sync_toolchain: package dir '$PKG_DIR' not found; nothing to do."
   exit 0
 fi
 
-# Ensure lake exists; if not, try installing elan quickly (CI-safe, local-friendly).
+# --- Try to extract Mathlib rev and fetch toolchain directly from GitHub ---
+REV=""
+if [[ -f "$LAKE_TOML" ]]; then
+  # Grab the first 'rev = "...“' under the mathlib requirement if present
+  REV="$(awk '
+    BEGIN{inreq=0}
+    /^\s*\[\[require\]\]/{inreq=0}
+    /^\s*\[\[require\]\]/{block=1}
+    block && /^\s*name\s*=\s*"mathlib"\s*$/ {inreq=1}
+    inreq && /^\s*rev\s*=\s*"/ {
+      match($0, /rev\s*=\s*"([^"]+)"/, m); if (m[1]!="") {print m[1]; exit}
+    }
+  ' "$LAKE_TOML" || true)"
+fi
+
+fetch_from_github() {
+  local ref="$1"
+  local url="https://raw.githubusercontent.com/leanprover-community/mathlib4/${ref}/lean-toolchain"
+  echo "sync_toolchain: attempting to curl mathlib toolchain at ref '${ref}'"
+  if curl -fsSL "$url" -o "$PROJECT_TC.tmp"; then
+    mv "$PROJECT_TC.tmp" "$PROJECT_TC"
+    echo "sync_toolchain: wrote $PROJECT_TC from mathlib4@${ref} ✅"
+    return 0
+  fi
+  return 1
+}
+
+if [[ -n "${REV}" ]]; then
+  if fetch_from_github "${REV}"; then exit 0; fi
+fi
+
+# If no rev in Lake.toml, try master/main heads in order
+for ref in master main; do
+  if fetch_from_github "${ref}"; then exit 0; fi
+done
+
+echo "sync_toolchain: curl path unavailable; falling back to lake materialization…"
+
+# --- Fallback: ensure `lake` exists and materialize via `lake update || true` ---
 if ! command -v lake >/dev/null 2>&1; then
   if command -v curl >/dev/null 2>&1; then
-    echo "sync_toolchain: 'lake' not found — installing elan to obtain it..."
+    echo "sync_toolchain: installing elan to obtain 'lake'…"
     curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | bash -s -- -y >/dev/null
     export PATH="$HOME/.elan/bin:$PATH"
   fi
@@ -26,34 +67,26 @@ fi
 
 pushd "$PKG_DIR" >/dev/null
 
-have_lake=0
-if command -v lake >/dev/null 2>&1; then have_lake=1; fi
-
-# If mathlib's toolchain isn't there yet, try to create it via 'lake update' when possible.
-if [[ ! -f "$MATHLIB_TC_REL" ]]; then
-  if [[ "$have_lake" -eq 1 ]]; then
-    echo "sync_toolchain: '$MATHLIB_TC_REL' missing; running 'lake update' to materialize it..."
-    lake update
-  else
-    echo "sync_toolchain: '$MATHLIB_TC_REL' missing and 'lake' still not found; skipping (will be retried later)."
+if command -v lake >/dev/null 2>&1; then
+  # Don’t let cache mismatch kill us here.
+  lake update || true
+  MTC=".lake/packages/mathlib/lean-toolchain"
+  if [[ -f "$MTC" ]]; then
+    if [[ -f "lean-toolchain" ]] && cmp -s "$MTC" "lean-toolchain"; then
+      echo "sync_toolchain: toolchain already in sync ✅"
+    else
+      cp "$MTC" "lean-toolchain"
+      echo "sync_toolchain: synced toolchain from .lake/packages/mathlib ✅"
+    fi
     popd >/dev/null
     exit 0
+  else
+    echo "sync_toolchain: mathlib toolchain file not found after lake update; skipping."
   fi
-fi
-
-# If still missing after lake update, nothing to sync.
-if [[ ! -f "$MATHLIB_TC_REL" ]]; then
-  echo "sync_toolchain: mathlib toolchain still not found after 'lake update'; skipping."
-  popd >/dev/null
-  exit 0
-fi
-
-# Sync only when different (keeps git diffs clean).
-if [[ -f "$PROJECT_TC_REL" ]] && cmp -s "$MATHLIB_TC_REL" "$PROJECT_TC_REL"; then
-  echo "sync_toolchain: toolchain already in sync ✅"
 else
-  echo "sync_toolchain: syncing mathlib → project toolchain"
-  cp "$MATHLIB_TC_REL" "$PROJECT_TC_REL"
+  echo "sync_toolchain: 'lake' not available; skipping."
 fi
 
 popd >/dev/null
+exit 0
+
