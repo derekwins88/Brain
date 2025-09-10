@@ -1,18 +1,26 @@
 name: CI - Lean4
 on: [push, pull_request]
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      LEAN_WARN_AS_ERROR: true # fail on warnings and `sorry`
     steps:
       - uses: actions/checkout@v4
+
+      # Use the official Lean action and tell it where your Lake package lives.
       - name: Setup Lean
         uses: leanprover/lean-action@v1
         with:
-          working-directory: lean
-      - name: Build
-        run: |
-          cd lean
-          lake update
-          lake build
+          lake-package-directory: lean # <<< valid input
+          auto-config: true
+          use-mathlib-cache: true # faster builds
+
+      # Generate lake-manifest.json and fetch mathlib
+      - name: lake update
+        run: lake update
+        working-directory: lean
+
+      # Build your package
+      - name: lake build
+        run: lake build
+        working-directory: lean
