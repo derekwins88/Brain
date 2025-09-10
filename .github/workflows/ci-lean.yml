@@ -5,24 +5,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+    defaults:
+      run:
+        shell: bash
 
-      # Install Lean via elan and prep Mathlib cache where your Lake package lives
-      - name: Setup Lean
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install elan (bootstrap)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | bash -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Sync toolchain with Mathlib (pre-action)
+        run: |
+          bash .github/scripts/sync_toolchain.sh lean
+        env:
+          LEAN_PACKAGE_DIR: lean
+
+      - name: Setup Lean (official action)
         uses: leanprover/lean-action@v1
         with:
-          lake-package-directory: lean      # <-- valid input
+          lake-package-directory: lean
           auto-config: true
           use-mathlib-cache: true
           reinstall-transient-toolchain: true
 
-      # Create lake-manifest.json and fetch deps
       - name: lake update
         run: lake update
         working-directory: lean
 
-      # Build the package
       - name: lake build
         run: lake build
         working-directory: lean
