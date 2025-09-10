@@ -3,6 +3,8 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      LEAN_WARN_AS_ERROR: true # fail on warnings and `sorry`
     steps:
       - uses: actions/checkout@v4
       - name: Setup Lean
