@@ -1,3 +1,10 @@
+[![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml)
+[![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml)
+[![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml)
+[![Proof v1.1 (smoke)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml)
+
+**Status:** Day-1 green ✅ — Python, .NET, Lean4 build pass; Proof v1.1 pipeline smoke passes (PDF check is permissive until full translator is wired).
+
 # Day-0 Mission
 
 Turn **harmonic entropy drift** into **machine-checkable P≠NP artifacts** in ≤ 30 days.
@@ -33,11 +40,6 @@ git push origin lean4-proof
 - You can later swap in capsule metadata (hash, ΔΦ window) and strengthen the statement.
 
 See: `lean4_pnp.lean`.
-
----
-
-![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)
-![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)
 
 ---
 
