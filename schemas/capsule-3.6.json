@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IMM Cognition Capsule v3.6",
+  "type": "object",
+  "required": ["capsule_id", "version", "timestamp", "proof_hooks", "bindings"],
+  "properties": {
+    "capsule_id": { "type": "string" },
+    "version": { "const": "3.6" },
+    "mnemonic": { "type": "string" },
+    "bindings": { "type": "object" },
+    "state_metrics": { "type": "object" },
+    "cognition_v35": { "type": "object" },
+    "proof_hooks": {
+      "type": "object",
+      "required": ["entropy_series_window", "pnp_engine", "emit", "criterion"]
+    },
+    "trinity_linkage": { "type": "object" },
+    "rituals": { "type": "object" },
+    "ethics_boundary": { "type": "object" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "sat_provenance": { "type": "object" },
+        "hashes": {
+          "type": "object",
+          "properties": {
+            "cnf_sha256": { "type": "string" },
+            "entropy_sha256": { "type": "string" }
+          },
+          "required": ["cnf_sha256", "entropy_sha256"]
+        }
+      }
+    }
+  }
+}
