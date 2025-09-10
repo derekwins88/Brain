@@ -1,9 +1,0 @@
-name: Feature
-description: A small improvement with tests
-body:
-  - type: textarea
-    id: proposal
-    attributes:
-      label: Proposal
-      description: what and why
-    validations: { required: true }

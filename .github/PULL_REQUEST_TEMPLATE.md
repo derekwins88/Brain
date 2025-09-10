@@ -1,13 +1,31 @@
-## What
+# Pull Request Template
 
-- [ ] Tests pass locally
-- [ ] CI is green
-- [ ] Docs/README updated if behavior changed
+Thank you for contributing to **Brain**!  
+Please check all boxes before requesting review.
 
-## Why
+---
 
-Artifact-first verification: capsules + hashes + SAT provenance.
+## ✅ PR Checklist
 
-## Notes
+- [ ] **All tests pass**
+  - Python: `pytest -q`
+  - .NET: `dotnet test`
 
-Link issues and include artifact IDs (capsule_id, cnf_sha256).
+- [ ] **Docs touched**
+  - `README.md`, `CONTRIBUTING.md`, or inline comments updated.
+
+- [ ] **Story sentence included**
+  - One line connecting this change to the Truth↔Narrative bridge.
+  - Example: _“This refactor stabilizes the entropy gate — the glyph no longer drifts without cause.”_
+
+---
+
+## 📝 PR Summary
+
+<!-- Short description of the change and why it matters -->
+
+---
+
+## 🔗 Related Issues
+
+<!-- e.g. Closes #123 -->
