@@ -1,6 +1,40 @@
-# Brain
+# Day-0 Mission
 
-Interdisciplinary symbol–logic engine with entropy-driven P≠NP capsules.
+Turn **harmonic entropy drift** into **machine-checkable P≠NP artifacts** in ≤ 30 days.
+
+> Progressive feedback loop → **Entropy-Collapse Labs** | P≠NP via glyphs & entropy
+
+---
+
+# Day-1: Lean4 Skeleton (Proof Capsule Hook)
+
+This repo ships a minimal Lean4 skeleton so we can pin a green check and
+start threading capsules → proofs.
+
+### Steps
+
+1. Open the Lean4 playground: https://live.lean-lang.org
+2. Paste the contents of `lean4_pnp.lean`.
+3. Press ▶ (Run). You should see a green check.
+4. Take a screenshot and save it to `docs/day1_lean.png`.
+5. Commit the file and screenshot on branch `lean4-proof`.
+
+```bash
+git checkout -b lean4-proof
+git add lean4_pnp.lean docs/day1_lean.png
+git commit -m "Day-1: Lean4 skeleton compiles (green check)"
+git push origin lean4-proof
+```
+
+### Why this skeleton?
+
+- It encodes the **NP-wall** & **no-recovery** gates as named predicates.
+- The theorem returns `True` (trivial) so it **compiles cleanly** without external deps.
+- You can later swap in capsule metadata (hash, ΔΦ window) and strengthen the statement.
+
+See: `lean4_pnp.lean`.
+
+---
 
 ![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)
 ![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)
