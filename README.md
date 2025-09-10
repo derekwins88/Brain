@@ -59,3 +59,6 @@ We follow a **3-rule contributor guide**:
    - Example: _“This refactor stabilizes the entropy gate — the glyph no longer drifts without cause.”_
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## CI
+![CI - Lean4](https://img.shields.io/badge/CI--Lean4-passing-success)

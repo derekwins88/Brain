@@ -4,23 +4,25 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
-      # Use the official Lean action and tell it where your Lake package lives.
+      # Install Lean via elan and prep Mathlib cache where your Lake package lives
       - name: Setup Lean
         uses: leanprover/lean-action@v1
         with:
-          lake-package-directory: lean # <<< valid input
+          lake-package-directory: lean      # <-- valid input
           auto-config: true
-          use-mathlib-cache: true # faster builds
+          use-mathlib-cache: true
+          reinstall-transient-toolchain: true
 
-      # Generate lake-manifest.json and fetch mathlib
+      # Create lake-manifest.json and fetch deps
       - name: lake update
         run: lake update
         working-directory: lean
 
-      # Build your package
+      # Build the package
       - name: lake build
         run: lake build
         working-directory: lean
