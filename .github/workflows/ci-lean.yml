@@ -1,0 +1,16 @@
+name: CI - Lean4
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Lean
+        uses: leanprover/lean-action@v1
+        with:
+          working-directory: lean
+      - name: Build
+        run: |
+          cd lean
+          lake update
+          lake build
