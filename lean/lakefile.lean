@@ -2,8 +2,10 @@ import Lake
 open Lake DSL
 
 package «brain» where
-  moreServerArgs := #[]
-  -- add buildArgs if you like: buildArgs := #["-Dlinter.missingDocs=false"]
+  -- Uncomment later to fail on sorry:
+  -- moreServerArgs := #["--no-sorry"]
+  -- Uncomment later to make warnings fail:
+  -- buildArgs := #["-Werror"]
 
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"
