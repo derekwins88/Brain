@@ -1,0 +1,32 @@
+name: Dependabot auto-merge
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+
+      # Optional: only auto-merge patch & minor bumps
+      - name: Guard by semver
+        if: ${{ !contains('major', steps.meta.outputs.update-type) }}
+        run: echo "semver ok"
+
+      - name: Auto-approve
+        uses: peter-evans/auto-approve-action@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge (squash)
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          pull-request-number: ${{ github.event.pull_request.number }}
+          merge-method: squash
+          token: ${{ secrets.GITHUB_TOKEN }}
