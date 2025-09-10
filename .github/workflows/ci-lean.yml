@@ -1,6 +1,5 @@
----
 name: CI - Lean4
-"on": [push, pull_request]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -10,7 +9,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Lean
+      # Stage A: bootstrap elan to get 'lake' so we can sync toolchain
+      - name: Install elan (bootstrap)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | bash -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      # Stage A2: sync project toolchain to Mathlib's (materializes via lake update if needed)
+      - name: Sync toolchain with Mathlib (pre-action)
+        run: bash .github/scripts/sync_toolchain.sh lean
+
+      # Stage B: official Lean action now sees correct toolchain and restores Mathlib cache
+      - name: Setup Lean (official action)
         uses: leanprover/lean-action@v1
         with:
           lake-package-directory: lean
@@ -18,14 +28,10 @@ jobs:
           use-mathlib-cache: true
           reinstall-transient-toolchain: true
 
-      - name: Sync toolchain with Mathlib
-        run: |
-          bash .github/scripts/sync_toolchain.sh lean
-
+      # Optional guard: fail if someone changed lean/lean-toolchain after sync
       - name: Verify toolchain in sync
         run: |
-          diff lean/.lake/packages/mathlib/lean-toolchain \
-            lean/lean-toolchain || (
+          diff lean/.lake/packages/mathlib/lean-toolchain lean/lean-toolchain || (
             echo "Toolchain mismatch with Mathlib!" >&2; exit 1
           )
 

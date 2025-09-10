@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Sync project's lean-toolchain with Mathlib's pinned toolchain (idempotent).
-# - Uses existing mathlib toolchain if available.
-# - If missing and 'lake' exists, runs 'lake update' to materialize it.
-# - If 'lake' is missing and toolchain isn't present, exits 0 (no-op).
+# - Ensures 'lake' exists (installs elan if missing, when possible).
+# - Runs 'lake update' to materialize mathlib toolchain if needed.
+# - Copies mathlib's toolchain to project root only when different.
 
 set -euo pipefail
 
@@ -15,12 +15,19 @@ if [[ ! -d "$PKG_DIR" ]]; then
   exit 0
 fi
 
+# Ensure lake exists; if not, try installing elan quickly (CI-safe, local-friendly).
+if ! command -v lake >/dev/null 2>&1; then
+  if command -v curl >/dev/null 2>&1; then
+    echo "sync_toolchain: 'lake' not found — installing elan to obtain it..."
+    curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | bash -s -- -y >/dev/null
+    export PATH="$HOME/.elan/bin:$PATH"
+  fi
+fi
+
 pushd "$PKG_DIR" >/dev/null
 
 have_lake=0
-if command -v lake >/dev/null 2>&1; then
-  have_lake=1
-fi
+if command -v lake >/dev/null 2>&1; then have_lake=1; fi
 
 # If mathlib's toolchain isn't there yet, try to create it via 'lake update' when possible.
 if [[ ! -f "$MATHLIB_TC_REL" ]]; then
@@ -28,7 +35,7 @@ if [[ ! -f "$MATHLIB_TC_REL" ]]; then
     echo "sync_toolchain: '$MATHLIB_TC_REL' missing; running 'lake update' to materialize it..."
     lake update
   else
-    echo "sync_toolchain: '$MATHLIB_TC_REL' missing and 'lake' not found; skip (will be retried later)."
+    echo "sync_toolchain: '$MATHLIB_TC_REL' missing and 'lake' still not found; skipping (will be retried later)."
     popd >/dev/null
     exit 0
   fi
