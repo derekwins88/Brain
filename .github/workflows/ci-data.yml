@@ -1,0 +1,33 @@
+name: CI - Data
+on: [push, pull_request]
+
+jobs:
+  check-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run quick CPU sieve (small)
+        run: |
+          python --version || sudo apt-get update && sudo apt-get install -y python3 python3-pip
+          python3 - <<'PY'
+import os, subprocess, sys
+# run small sample to produce CSV/meta; force CPU run
+env = os.environ.copy()
+env["N_TRACES"] = "20000"
+env["TRACE_LEN"] = "48"
+env["CSV_PATH"]  = "data/entropy_sieve_ci.csv"
+env["META_PATH"] = "data/entropy_sieve_ci.json"
+env["SPIKE_PROB"] = "0.035"
+rc = subprocess.call([sys.executable, "sieve.py"], env=env)
+sys.exit(rc)
+PY
+
+      - name: Verify CSV exists & has rows
+        run: |
+          test -f data/entropy_sieve_ci.csv || (echo "CSV missing" && exit 1)
+          lines=$(wc -l < data/entropy_sieve_ci.csv)
+          if [ "$lines" -lt 50 ]; then
+            echo "CSV too small ($lines lines)"; exit 1
+          fi
+          echo "✅ CSV ok ($lines lines)"

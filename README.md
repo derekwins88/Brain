@@ -26,8 +26,42 @@ Turn **harmonic entropy drift** into **machine-checkable P≠NP artifacts** in �
 – Returns `True` (via `sorry`) so it compiles cleanly.  
 – Capsule metadata and seed file (entropy thresholds, provenance) strengthen the statement.  
 
-See: [lean4_pnp.lean](./lean4_pnp.lean)  
-Capsule: [IMM_MATH_ALSTEIN01](./capsules/IMM_MATH_ALSTEIN01.json)  
+See: [lean4_pnp.lean](./lean4_pnp.lean)
+Capsule: [IMM_MATH_ALSTEIN01](./capsules/IMM_MATH_ALSTEIN01.json)
+
+## Day-2: GPU Entropy Sieve ✅
+
+![CI - Data](https://github.com/derekwins88/Brain/actions/workflows/ci-data.yml/badge.svg)
+
+We added a GPU-accelerated sieve (`sieve.py`) that scans entropy traces and flags irreversible spikes above the NP threshold (ΔΦ > 0.09). It auto-selects CUDA (CuPy) when available and falls back to CPU (NumPy).
+
+**Quick start**
+```bash
+# Small local run (CPU ok)
+python3 sieve.py
+
+# Bigger run (edit envs)
+N_TRACES=10000000 TRACE_LEN=64 CSV_PATH=data/entropy_sieve_10m.csv python3 sieve.py
+
+Colab
+Open: https://colab.research.google.com/github/derekwins88/Brain/blob/main/sieve.py
+Run all → commit the CSV from /content/ to data/.
+
+Artifacts:
+    •    CSV summary per trace: data/entropy_sieve_*.csv
+    •    Meta summary: data/entropy_sieve_*.json
+
+---
+
+## 5) (Optional) Day-2 tweet stub
+
+```text
+Day-2 🚀
+GPU entropy sieve online — 10M+ traces scanned.
+% irreversible above ΔΦ 0.09 reported in meta.
+Notebook: github.com/derekwins88/Brain/blob/main/sieve.py
+#PvsNP #Lean4 #EntropyCollapse
+```
 
 ---
 
