@@ -43,6 +43,10 @@ python3 sieve.py
 # Bigger run (edit envs)
 N_TRACES=10000000 TRACE_LEN=64 CSV_PATH=data/entropy_sieve_10m.csv python3 sieve.py
 
+```
+
+Day-2 capsule: [SIEVE_DAY2](./capsules/SIEVE_DAY2.json)
+
 Colab
 Open: https://colab.research.google.com/github/derekwins88/Brain/blob/main/sieve.py
 Run all → commit the CSV from /content/ to data/.
