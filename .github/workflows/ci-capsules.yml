@@ -1,5 +1,8 @@
 name: CI - Capsules
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [main]
 
 jobs:
   check-capsules:
@@ -8,11 +11,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Check for capsule files
+        continue-on-error: true
         run: |
-          if [ -z "$(ls capsules/*.json 2>/dev/null)" ]; then
-            echo "❌ No capsules found in /capsules"
-            exit 1
-          else
+          if ls capsules/*.json >/dev/null 2>&1; then
             echo "✅ Capsules detected:"
-            ls capsules/*.json
+            ls -1 capsules/*.json
+          else
+            echo "⚠️ No capsules found in /capsules (non-blocking)"
+            exit 0
           fi

@@ -1,0 +1,27 @@
+{
+  "SchemaVersion": "capsule-1.1.0",
+  "capsule_id": "IMM_MATH_ALSTEIN01",
+  "title": "Entropy Curvature Threshold (Alstein Frame) — Seed",
+  "Claim": "OPEN",
+  "Metadata": {
+    "np_wall": true,
+    "no_recovery": false,
+    "pde_strength": 0.44,
+    "sat_provenance": {
+      "mode": "unit-contradiction",
+      "binary": null
+    }
+  },
+  "entropy_series": [
+    0.042, 0.051, 0.064, 0.072, 0.081, 0.103, 0.128,
+    0.145, 0.159, 0.173, 0.164, 0.150, 0.134, 0.117,
+    0.101, 0.088, 0.077, 0.066, 0.057, 0.050, 0.044
+  ],
+  "thresholds": {
+    "P_threshold": 0.045,
+    "NP_threshold": 0.09
+  },
+  "links": {
+    "lean_proof": "./lean4_pnp.lean"
+  }
+}

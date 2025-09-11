@@ -22,12 +22,12 @@ Turn **harmonic entropy drift** into **machine-checkable P≠NP artifacts** in �
 ![CI - Proof](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg)
 ![CI - Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg)
 
-- Encodes the NP-wall & no-recovery gates as predicates.
-- Returns `True` (via `sorry`) so it compiles cleanly.
-- Capsule metadata strengthens the statement.
+– Encodes the NP-wall & no-recovery gates as predicates.  
+– Returns `True` (via `sorry`) so it compiles cleanly.  
+– Capsule metadata and seed file (entropy thresholds, provenance) strengthen the statement.  
 
 See: [lean4_pnp.lean](./lean4_pnp.lean)  
-Capsule: [IMM⇌MATH⇌ALSTEIN01](./capsules/IMM_MATH_ALSTEIN01.json)
+Capsule: [IMM_MATH_ALSTEIN01](./capsules/IMM_MATH_ALSTEIN01.json)  
 
 ---
 
