@@ -1,0 +1,37 @@
+name: CI - Data
+on: [push, pull_request]
+
+jobs:
+  check-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy  # CuPy optional; we fall back to CPU
+
+      - name: Run quick CPU sieve (small)
+        env:
+          N_TRACES: "20000"
+          TRACE_LEN: "48"
+          CSV_PATH: "data/entropy_sieve_ci.csv"
+          META_PATH: "data/entropy_sieve_ci.json"
+          SPIKE_PROB: "0.035"
+        run: |
+          python sieve.py
+
+      - name: Verify CSV exists & has rows
+        run: |
+          test -f data/entropy_sieve_ci.csv || (echo "CSV missing" && exit 1)
+          lines=$(wc -l < data/entropy_sieve_ci.csv)
+          if [ "$lines" -lt 50 ]; then
+            echo "CSV too small ($lines lines)"; exit 1
+          fi
+          echo "✅ CSV ok ($lines lines)"
