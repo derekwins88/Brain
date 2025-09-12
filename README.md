@@ -81,6 +81,16 @@ Notebook: github.com/derekwins88/Brain/blob/main/sieve.py
   Metadata → **[docs/day3_infographic.json](docs/day3_infographic.json)**  
   Open in Colab → **[render_infographic.ipynb](https://colab.research.google.com/github/derekwins88/Brain/blob/main/notebooks/render_infographic.ipynb)**
 
+_Re-render locally:_
+
+```bash
+python -m nbconvert --to notebook --execute \
+  notebooks/render_infographic.ipynb \
+  --output /tmp/render_output.ipynb
+```
+
+Or trigger the Auto-render infographic GitHub Action to refresh docs/day3_infographic.png automatically.
+
 > Tip: in Colab, **Runtime → Run all**. The notebook writes `docs/day3_infographic.png` back into the repo tree for an easy PR.
 
 ---
