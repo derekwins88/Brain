@@ -1,29 +1,12 @@
 {
-  "id": "DAY3_001",
-  "version": "0.1.0",
-  "title": "Day-3 Infographic — Entropy Sieve Snapshot",
-  "subtitle": "Auto-rendered from latest Day-2 meta",
-  "created_at": "{{AUTO}}",
-  "sources": {
-    "sieve_meta": "capsules/SIEVE_DAY2.json"
-  },
+  "schema_version": "1.0.0",
+  "title": "Entropy Sieve – Day 3 Snapshot",
+  "subtitle": "Live metrics from SIEVE_DAY2 + static fallback",
   "metrics": {
     "np_wall_pct": 3.7,
-    "np_threshold": 0.09,
-    "p_threshold": 0.045,
-    "samples": 2000,
-    "trace_len": 48
+    "thresholds": { "np": 0.09, "p": 0.045 },
+    "traces": 100000000
   },
-  "visuals": {
-    "output_png": "docs/day3_infographic.png",
-    "theme": "dark",
-    "palette": ["#4f46e5", "#0b1020"]
-  },
-  "notes": [
-    "GPU-aware sieve (CuPy→NumPy fallback)",
-    "3.7% irreversible spikes (ΔΦ > 0.09)",
-    "Auto-synced with capsules pipeline",
-    "Rates shown are CI sample output; larger jobs may differ.",
-    "See capsules/SIEVE_DAY2.json for provenance."
-  ]
+  "notes": ["Rendered automatically from notebook"],
+  "timestamp": "2025-09-12T20:28:55Z"
 }
