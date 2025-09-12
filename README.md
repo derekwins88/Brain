@@ -71,15 +71,17 @@ Notebook: github.com/derekwins88/Brain/blob/main/sieve.py
 ## Gallery
 
 - **Lean4 Green Check (Day-1)**  
-  ![Lean4](docs/day1_lean.png)
+  ![lean4 green](docs/day1_lean.png)
 
 - **Day-2 Sieve Capsule**  
   See: [`SIEVE_DAY2`](capsules/SIEVE_DAY2.json)
 
 - **Day-3 Infographic (auto-rendered)**  
-  Output: [`docs/day3_infographic.png`](docs/day3_infographic.png)  
-  Metadata: [`docs/day3_infographic.json`](docs/day3_infographic.json)  
-  Open in Colab: <https://colab.research.google.com/github/derekwins88/Brain/blob/main/notebooks/render_infographic.ipynb>
+  Output → **[docs/day3_infographic.png](docs/day3_infographic.png)**  
+  Metadata → **[docs/day3_infographic.json](docs/day3_infographic.json)**  
+  Open in Colab → **[render_infographic.ipynb](https://colab.research.google.com/github/derekwins88/Brain/blob/main/notebooks/render_infographic.ipynb)**
+
+> Tip: in Colab, **Runtime → Run all**. The notebook writes `docs/day3_infographic.png` back into the repo tree for an easy PR.
 
 ---
 
