@@ -57,7 +57,7 @@ Artifacts:
 
 ---
 
-## 5) (Optional) Day-2 tweet stub
+## Day-2 tweet stub
 
 ```text
 Day-2 🚀
