@@ -1,12 +1,14 @@
-<!-- Badges: add near your other CI badges -->
-![CI – Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)
-![CI – .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)
-![CI – Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg)
-![CI – Proof v1.1 (smoke)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg)
-![CI – Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg)
-![CI – Data](https://github.com/derekwins88/Brain/actions/workflows/ci-data.yml/badge.svg)
-![CI – Infographic](https://github.com/derekwins88/Brain/actions/workflows/auto_render_infographic.yml/badge.svg)
-![CI – Bench](https://github.com/derekwins88/Brain/actions/workflows/ci-bench.yml/badge.svg)
+<!-- Badges row -->
+![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)
+![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)
+![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg)
+![CI - Proof v1.1 (smoke)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg)
+![CI - Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg)
+![CI - Data](https://github.com/derekwins88/Brain/actions/workflows/ci-data.yml/badge.svg)
+![auto_render_infographic](https://github.com/derekwins88/Brain/actions/workflows/auto_render_infographic.yml/badge.svg)
+![CI - Bench](https://github.com/derekwins88/Brain/actions/workflows/ci-bench.yml/badge.svg)
+<!-- DOI badge placeholder; will activate after first Zenodo release -->
+[![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)](#)
 
 **Status:** Day-1 green ✅ — Python, .NET, Lean4 build pass; Proof v1.1 pipeline smoke passes (PDF check is permissive until full translator is wired).
 
@@ -17,6 +19,23 @@ Turn **harmonic entropy drift** into **machine-checkable P≠NP artifacts** in �
 > Progressive feedback loop → **Entropy-Collapse Labs** | P≠NP via glyphs & entropy
 
 ---
+
+## Gallery
+
+- **Lean4 Green Check (Day-1)**  
+  Output: `docs/day1_lean.png`
+
+- **Day-2 Sieve Capsule**  
+  See: [SIEVE_DAY2](./capsules/SIEVE_DAY2.json)
+
+- **Day-3 Infographic (auto-rendered)**  
+  Output: [docs/day3_infographic.png](./docs/day3_infographic.png)  
+  Metadata: [docs/day3_infographic.json](./docs/day3_infographic.json) *(optional)*  
+  Open in Colab: https://colab.research.google.com/github/derekwins88/Brain/blob/main/notebooks/render_infographic.ipynb
+
+- **Day-4 Benchmark & Gallery**  
+  Gallery page: [docs/gallery.html](./docs/gallery.html)  
+  Throughput chart: [gallery/day4_bench.png](./gallery/day4_bench.png)
 
 ## Day-1: Lean4 Proof Scaffold ✅
 

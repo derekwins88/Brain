@@ -3,68 +3,84 @@ name: Auto-render infographic
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch:
+    paths:
+      - "notebooks/render_infographic.ipynb"
+      - "schema/infographic.schema.json"
+      - "capsules/**"
+      - "docs/day3_infographic.json"
+      - ".github/workflows/auto_render_infographic.yml"
+  workflow_dispatch: {}
 
-# Needed only if you keep the "commit back" step enabled.
 permissions:
   contents: write
 
 jobs:
   render:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: true
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install deps
+      - name: Install notebook toolchain
         run: |
           python -m pip install --upgrade pip
-          python -m pip install jupyter nbconvert matplotlib pillow jsonschema
+          # Pin a stable nbconvert stack; include nbclient/nbformat/jupyter/pillow/matplotlib/jsonschema
+          pip install "nbconvert==7.*" nbclient nbformat jupyter ipython ipykernel \
+                      matplotlib pillow jsonschema
 
-      - name: Execute infographic notebook
+      - name: Execute notebook (headless)
+        env:
+          # Optional: point the notebook at your Day-2 capsule JSON if it supports it
+          SIEVE_CAPSULE_JSON: "capsules/SIEVE_DAY2.json"
+          OUTPUT_PNG: "docs/day3_infographic.png"
         run: |
-          python -m nbconvert --to notebook --execute \
+          # Execute and write a temp executed notebook (useful for debugging if it fails)
+          jupyter nbconvert --to notebook --execute \
             notebooks/render_infographic.ipynb \
-            --output /tmp/render_infographic_out.ipynb
-        # Notebook should write docs/day3_infographic.png
+            --output /tmp/render_out.ipynb
+          # Ensure expected PNG exists (notebook should save it)
+          test -f "docs/day3_infographic.png" || (echo "PNG not found after run" && ls -R && exit 1)
 
-      - name: Validate metadata (if present)
+      - name: Validate optional metadata JSON against schema
+        if: always()
         run: |
           if [ -f docs/day3_infographic.json ]; then
             python - <<'PY'
-import json, jsonschema
-schema = json.load(open('schema/infographic.schema.json'))
-data = json.load(open('docs/day3_infographic.json'))
+import json, jsonschema, sys
+with open("schema/infographic.schema.json") as f: schema=json.load(f)
+with open("docs/day3_infographic.json") as f: data=json.load(f)
 jsonschema.validate(data, schema)
-print("OK: docs/day3_infographic.json matches schema")
+print("✅ JSON schema validation passed for docs/day3_infographic.json")
 PY
           else
-            echo "No docs/day3_infographic.json found; skipping validation."
+            echo "No docs/day3_infographic.json present; skipping validation."
           fi
 
-      - name: Upload PNG as artifact (safe)
+      - name: Upload artifacts (executed notebook + png)
         uses: actions/upload-artifact@v4
         with:
-          name: day3-infographic
-          path: docs/day3_infographic.png
+          name: day3-infographic-assets
+          path: |
+            /tmp/render_out.ipynb
+            docs/day3_infographic.png
+            docs/day3_infographic.json
+          if-no-files-found: warn
 
-      # OPTIONAL: commit the PNG back to the repo on main
-      - name: Commit updated PNG to docs/ (optional)
-        if: github.ref == 'refs/heads/main'
+      - name: Commit updated PNG (only if changed)
         run: |
-          set -e
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/day3_infographic.png || true
+          git add docs/day3_infographic.png
           if ! git diff --staged --quiet; then
-            git commit -m "Auto-render: update day3_infographic.png"
+            git commit -m "auto: refresh Day-3 infographic PNG"
             git push origin HEAD:main
           else
             echo "No PNG changes to commit."
