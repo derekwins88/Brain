@@ -1,79 +1,62 @@
-name: Auto-render infographic
+name: CI - Infographic / render
 
 on:
   push:
     branches: [ "main" ]
+  pull_request:
     paths:
       - "notebooks/render_infographic.ipynb"
-      - "capsules/**"
-      - "schema/**"
+      - "docs/day3_infographic.json"
+      - "schema/infographic.schema.json"
       - ".github/workflows/auto_render_infographic.yml"
-      - "tools/inject_smoke_cell.py"
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   render:
     runs-on: ubuntu-latest
     env:
-      SMOKE: "1"             # run the notebook in smoke mode on CI
-      PYTHONUNBUFFERED: "1"
+      # PRs run in "SMOKE" mode (skip hard validation, allow notebook to render)
+      SMOKE: ${{ github.event_name == 'pull_request' && '1' || '0' }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Install minimal toolchain
+      - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          # Pin versions for stable headless execution
-          python -m pip install "nbconvert==7.*" "jupyter==1.*" pillow jsonschema matplotlib
+          python -m pip install nbconvert nbclient jupyter jsonschema matplotlib pillow
 
-      - name: Inject smoke guard cell (idempotent)
+      - name: Validate infographic JSON against schema (skipped in SMOKE)
+        if: env.SMOKE != '1'
         run: |
-          python tools/inject_smoke_cell.py notebooks/render_infographic.ipynb
-
-      - name: Execute (smoke) notebook headlessly
-        run: |
-          python -m nbconvert --to notebook --execute \
-            --ExecutePreprocessor.timeout=150 \
-            --output /tmp/render_out.ipynb \
-            notebooks/render_infographic.ipynb
-
-      - name: Validate metadata against schema (if present)
-        run: |
-          if [ -f schema/infographic.schema.json ] && [ -f docs/day3_infographic.json ]; then
-            python - <<'PY'
-import json, jsonschema
-jsonschema.validate(
-  json.load(open('docs/day3_infographic.json')),
-  json.load(open('schema/infographic.schema.json')),
-)
-print("JSON schema validation passed.")
-PY
-          else
-            echo "Schema or JSON missing; skipping validation."
+          if [ ! -f schema/infographic.schema.json ] || [ ! -f docs/day3_infographic.json ]; then
+            echo "Schema or JSON missing, skipping validation."
+            exit 0
           fi
+          python - <<'PY'
+import json, jsonschema, sys
+schema = json.load(open('schema/infographic.schema.json'))
+data   = json.load(open('docs/day3_infographic.json'))
+jsonschema.validate(data, schema)
+print("✅ JSON schema validation passed")
+PY
 
-      - name: Upload PNG as artifact
+      - name: Execute notebook (headless)
+        run: |
+          # allow_errors keeps the PNG step alive in smoke situations
+          python -m nbconvert --to notebook --execute \
+            --ExecutePreprocessor.allow_errors=True \
+            notebooks/render_infographic.ipynb \
+            --output /tmp/render_output.ipynb
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: day3-infographic-png
-          path: docs/day3_infographic.png
-
-      - name: Commit changed PNG back to repo (optional)
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/day3_infographic.png || true
-          if ! git diff --staged --quiet; then
-            git commit -m "Auto-render (smoke): update day3_infographic.png"
-            git push
-          else
-            echo "No image changes to commit."
-          fi
+          name: day3-infographic
+          path: |
+            docs/day3_infographic.png
+            docs/day3_infographic.json

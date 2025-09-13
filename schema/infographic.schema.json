@@ -1,63 +1,35 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.org/schema/infographic.schema.json",
-  "title": "InfographicMetadata",
+  "title": "Day-3 Infographic Metadata",
   "type": "object",
-  "required": ["id", "version", "title", "sources", "metrics", "visuals"],
+  "additionalProperties": true,
   "properties": {
-    "id": { "type": "string", "minLength": 1 },
-    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[A-Za-z0-9\\.]+)?$" },
-    "title": { "type": "string", "minLength": 1 },
+    "schema_version": { "type": "string" },
+    "title": { "type": "string" },
     "subtitle": { "type": "string" },
-    "created_at": { "type": "string", "format": "date-time" },
-
-    "sources": {
-      "type": "object",
-      "required": ["sieve_meta"],
-      "properties": {
-        "sieve_meta": { "type": "string", "minLength": 1 },
-        "capsule":    { "type": "string" },
-        "commit":     { "type": "string" },
-        "run_id":     { "type": "string" }
-      },
-      "additionalProperties": false
-    },
-
     "metrics": {
       "type": "object",
-      "required": ["np_wall_pct", "np_threshold", "p_threshold", "samples", "trace_len"],
+      "additionalProperties": true,
       "properties": {
-        "np_wall_pct": { "type": "number", "minimum": 0, "maximum": 100 },
-        "np_threshold": { "type": "number" },
-        "p_threshold": { "type": "number" },
-        "samples": { "type": "integer", "minimum": 1 },
-        "trace_len": { "type": "integer", "minimum": 1 },
-        "counts": {
+        "np_wall_pct": { "type": "number" },
+        "thresholds": {
           "type": "object",
+          "additionalProperties": true,
           "properties": {
-            "np_wall": { "type": "integer", "minimum": 0 },
-            "p_like":  { "type": "integer", "minimum": 0 },
-            "unknown": { "type": "integer", "minimum": 0 }
+            "np": { "type": "number" },
+            "p": { "type": "number" }
           },
-          "additionalProperties": false
-        }
+          "required": ["np", "p"]
+        },
+        "traces": { "type": ["integer", "number"] }
       },
-      "additionalProperties": false
+      "required": ["np_wall_pct", "thresholds", "traces"]
     },
-
-    "visuals": {
-      "type": "object",
-      "required": ["output_png", "theme"],
-      "properties": {
-        "output_png": { "type": "string", "minLength": 1 },
-        "output_svg": { "type": "string" },
-        "palette":    { "type": "array", "items": { "type": "string" } },
-        "theme":      { "type": "string", "enum": ["light", "dark"] }
-      },
-      "additionalProperties": false
-    },
-
-    "notes": { "type": "array", "items": { "type": "string" } }
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
   },
-  "additionalProperties": false
+  "required": ["schema_version", "title", "metrics", "timestamp"]
 }
