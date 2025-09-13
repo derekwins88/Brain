@@ -3,47 +3,97 @@ name: CI - Bench
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - "bench.py"
+      - "plot_bench.py"
+      - "gallery.py"
+      - ".github/workflows/ci-bench.yml"
   pull_request:
+    paths:
+      - "bench.py"
+      - "plot_bench.py"
+      - "gallery.py"
+      - ".github/workflows/ci-bench.yml"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   bench:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
+
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          python -m pip install numpy matplotlib pillow
+          # plotting/gallery helpers are optional; install basics only
+          python -m pip install matplotlib pillow
+
       - name: Run bench (small)
+        shell: bash
         run: |
-          set -e
+          set -euxo pipefail
           mkdir -p out gallery docs
-          # locate bench.py in common locations
-          BENCH=""
-          for p in bench.py scripts/bench.py python/bench.py python/brain/bench.py; do
-            if [ -f "$p" ]; then BENCH="$p"; break; fi
-          done
-          if [ -z "$BENCH" ]; then
-            echo "❌ Could not find bench.py (checked root, scripts/, python/, python/brain/)."
-            echo "Tip: place bench.py at repo root or set a stable path in ci-bench.yml."
+          # Use repo-root bench.py (stub) — replace with real harness later
+          if [ ! -f bench.py ]; then
+            echo "::error ::bench.py not found at repo root."
             exit 1
           fi
-          echo "➡ Running $BENCH ..."
-          python "$BENCH" --traces 100000 --mode auto || true
-      - name: Plot chart
+          python bench.py --traces 100000 --mode auto --out out/bench_auto.csv
+          # Guarantee an artifact exists for later steps
+          test -s out/bench_auto.csv
+
+      - name: Plot chart (optional)
+        if: ${{ hashFiles('plot_bench.py') != '' }}
         run: |
-          python plot_bench.py bench_*.csv -o gallery/day4_bench.png || true
-      - name: Build gallery HTML
+          python plot_bench.py out/bench_auto.csv -o gallery/day4_bench.png
+
+      - name: Build gallery HTML (optional)
+        if: ${{ hashFiles('gallery.py') != '' }}
         run: |
-          python gallery.py --capsules "out/*.json" --out docs/gallery.html || true
+          python gallery.py --capsules "out/*.json" --theme dark --out docs/gallery.html
+
+      - name: Create minimal gallery page (fallback)
+        if: ${{ hashFiles('gallery.py') == '' }}
+        run: |
+          cat > docs/gallery.html <<'HTML'
+          <!doctype html><meta charset="utf-8">
+          <title>Capsule Gallery (placeholder)</title>
+          <h1>Capsule Gallery (placeholder)</h1>
+          <p>This page will be auto-generated when <code>gallery.py</code> lands.</p>
+          <ul>
+            <li><a href="../out/bench_auto.csv">bench_auto.csv</a></li>
+          </ul>
+          HTML
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: day4-gallery
+          name: bench-artifacts
           path: |
+            out/bench_auto.csv
             gallery/day4_bench.png
             docs/gallery.html
+          if-no-files-found: warn
+
+      - name: Commit gallery (only on main, and if changed)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          set -eux
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/gallery.html || true
+          if ! git diff --staged --quiet; then
+            git commit -m "ci(bench): update gallery artifacts"
+            git push
+          else
+            echo "No gallery changes to commit."
+          fi
