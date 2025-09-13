@@ -1,5 +1,15 @@
 name: CI - Bench
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "bench.py"
+      - "plot_bench.py"
+      - "gallery.py"
+      - ".github/workflows/ci-bench.yml"
+  workflow_dispatch: {}
+
 permissions:
   contents: write   # only needed if you commit PNG/HTML back to main
 jobs:
