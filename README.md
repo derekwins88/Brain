@@ -33,6 +33,16 @@ Turn **harmonic entropy drift** into **machine-checkable Pâ‰ NP artifacts** in â
   Metadata: [docs/day3_infographic.json](./docs/day3_infographic.json) *(optional)*  
   Open in Colab: https://colab.research.google.com/github/derekwins88/Brain/blob/main/notebooks/render_infographic.ipynb
 
+> **Note:** CI runs the infographic notebook in **smoke mode** (`SMOKE=1`) to
+> produce a fast placeholder PNG. For the full render, open the notebook in
+> Colab or run locally without `SMOKE`:
+>
+> ```bash
+> make render-day3
+> # or explicitly:
+> python -m nbconvert --to notebook --execute notebooks/render_infographic.ipynb
+> ```
+
 - **Day-4 Benchmark & Gallery**  
   Gallery page: [docs/gallery.html](./docs/gallery.html)  
   Throughput chart: [gallery/day4_bench.png](./gallery/day4_bench.png)

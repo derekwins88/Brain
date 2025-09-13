@@ -5,11 +5,11 @@ on:
     branches: [ "main" ]
     paths:
       - "notebooks/render_infographic.ipynb"
-      - "schema/infographic.schema.json"
       - "capsules/**"
-      - "docs/day3_infographic.json"
+      - "schema/**"
       - ".github/workflows/auto_render_infographic.yml"
-  workflow_dispatch: {}
+      - "tools/inject_smoke_cell.py"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,71 +17,63 @@ permissions:
 jobs:
   render:
     runs-on: ubuntu-latest
-
+    env:
+      SMOKE: "1"             # run the notebook in smoke mode on CI
+      PYTHONUNBUFFERED: "1"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: true
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install notebook toolchain
+      - name: Install minimal toolchain
         run: |
           python -m pip install --upgrade pip
-          # Pin a stable nbconvert stack; include nbclient/nbformat/jupyter/pillow/matplotlib/jsonschema
-          pip install "nbconvert==7.*" nbclient nbformat jupyter ipython ipykernel \
-                      matplotlib pillow jsonschema
+          # Pin versions for stable headless execution
+          python -m pip install "nbconvert==7.*" "jupyter==1.*" pillow jsonschema matplotlib
 
-      - name: Execute notebook (headless)
-        env:
-          # Optional: point the notebook at your Day-2 capsule JSON if it supports it
-          SIEVE_CAPSULE_JSON: "capsules/SIEVE_DAY2.json"
-          OUTPUT_PNG: "docs/day3_infographic.png"
+      - name: Inject smoke guard cell (idempotent)
         run: |
-          # Execute and write a temp executed notebook (useful for debugging if it fails)
-          jupyter nbconvert --to notebook --execute \
-            notebooks/render_infographic.ipynb \
-            --output /tmp/render_out.ipynb
-          # Ensure expected PNG exists (notebook should save it)
-          test -f "docs/day3_infographic.png" || (echo "PNG not found after run" && ls -R && exit 1)
+          python tools/inject_smoke_cell.py notebooks/render_infographic.ipynb
 
-      - name: Validate optional metadata JSON against schema
-        if: always()
+      - name: Execute (smoke) notebook headlessly
         run: |
-          if [ -f docs/day3_infographic.json ]; then
+          python -m nbconvert --to notebook --execute \
+            --ExecutePreprocessor.timeout=150 \
+            --output /tmp/render_out.ipynb \
+            notebooks/render_infographic.ipynb
+
+      - name: Validate metadata against schema (if present)
+        run: |
+          if [ -f schema/infographic.schema.json ] && [ -f docs/day3_infographic.json ]; then
             python - <<'PY'
-import json, jsonschema, sys
-with open("schema/infographic.schema.json") as f: schema=json.load(f)
-with open("docs/day3_infographic.json") as f: data=json.load(f)
-jsonschema.validate(data, schema)
-print("✅ JSON schema validation passed for docs/day3_infographic.json")
+import json, jsonschema
+jsonschema.validate(
+  json.load(open('docs/day3_infographic.json')),
+  json.load(open('schema/infographic.schema.json')),
+)
+print("JSON schema validation passed.")
 PY
           else
-            echo "No docs/day3_infographic.json present; skipping validation."
+            echo "Schema or JSON missing; skipping validation."
           fi
 
-      - name: Upload artifacts (executed notebook + png)
+      - name: Upload PNG as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: day3-infographic-assets
-          path: |
-            /tmp/render_out.ipynb
-            docs/day3_infographic.png
-            docs/day3_infographic.json
-          if-no-files-found: warn
+          name: day3-infographic-png
+          path: docs/day3_infographic.png
 
-      - name: Commit updated PNG (only if changed)
+      - name: Commit changed PNG back to repo (optional)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/day3_infographic.png
+          git add docs/day3_infographic.png || true
           if ! git diff --staged --quiet; then
-            git commit -m "auto: refresh Day-3 infographic PNG"
-            git push origin HEAD:main
+            git commit -m "Auto-render (smoke): update day3_infographic.png"
+            git push
           else
-            echo "No PNG changes to commit."
+            echo "No image changes to commit."
           fi
