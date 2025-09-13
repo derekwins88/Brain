@@ -109,9 +109,18 @@ Notebook: github.com/derekwins88/Brain/blob/main/sieve.py
   Runs a micro-benchmark on CuPy when available (falls back to NumPy), then plots ΔΦ trace throughput.  
   **Chart:** [gallery/day4_bench.png](./gallery/day4_bench.png)
 
-- **Capsule Gallery (auto-built)**  
-  Lists recent capsules (latest JSONs) and embeds the Day-4 chart.  
+- **Capsule Gallery (auto-built)**
+  Lists recent capsules (latest JSONs) and embeds the Day-4 chart.
   **Open:** [docs/gallery.html](./docs/gallery.html)
+> **Note (bench stub)**  
+> CI currently runs a minimal `bench.py` placeholder that emits `out/bench_auto.csv`
+> so downstream steps stay green. When the full benchmark harness is ready, either
+> replace `bench.py` or point `.github/workflows/ci-bench.yml` to the new path.
+> Local smoke run:
+>
+> ```bash
+> python bench.py --traces 100000 --mode auto
+> ```
 
 ### Reproduce locally
 
