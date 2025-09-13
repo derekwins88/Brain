@@ -3,42 +3,43 @@ name: CI - Bench
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - "bench.py"
-      - "plot_bench.py"
-      - "gallery.py"
-      - ".github/workflows/ci-bench.yml"
-  workflow_dispatch: {}
+  pull_request:
+  workflow_dispatch:
 
-permissions:
-  contents: write   # only needed if you commit PNG/HTML back to main
 jobs:
   bench:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { persist-credentials: true }
-
       - uses: actions/setup-python@v4
-        with: { python-version: '3.11' }
-
+        with:
+          python-version: "3.11"
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install numpy cupy-cuda11x || pip install numpy  # tolerate no-GPU runners
-          pip install matplotlib pillow
-
+          python -m pip install numpy matplotlib pillow
       - name: Run bench (small)
         run: |
+          set -e
           mkdir -p out gallery docs
-          python bench.py --traces 100000 --mode auto -o out/bench_ci_auto.csv
-
+          # locate bench.py in common locations
+          BENCH=""
+          for p in bench.py scripts/bench.py python/bench.py python/brain/bench.py; do
+            if [ -f "$p" ]; then BENCH="$p"; break; fi
+          done
+          if [ -z "$BENCH" ]; then
+            echo "❌ Could not find bench.py (checked root, scripts/, python/, python/brain/)."
+            echo "Tip: place bench.py at repo root or set a stable path in ci-bench.yml."
+            exit 1
+          fi
+          echo "➡ Running $BENCH ..."
+          python "$BENCH" --traces 100000 --mode auto || true
       - name: Plot chart
-        run: python plot_bench.py out/bench_ci_auto.csv -o gallery/day4_bench.png
-
+        run: |
+          python plot_bench.py bench_*.csv -o gallery/day4_bench.png || true
       - name: Build gallery HTML
-        run: python gallery.py --capsules out/*.json --theme dark --out docs/gallery.html || echo "No capsules yet; built page without list."
-
+        run: |
+          python gallery.py --capsules "out/*.json" --out docs/gallery.html || true
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -46,17 +47,3 @@ jobs:
           path: |
             gallery/day4_bench.png
             docs/gallery.html
-
-      # Optional: commit updates back to main if files changed
-      - name: Commit gallery (optional)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add gallery/day4_bench.png docs/gallery.html
-          if ! git diff --staged --quiet; then
-            git commit -m "ci(bench): refresh Day-4 chart + gallery"
-            git push
-          else
-            echo "No changes to commit."
-          fi

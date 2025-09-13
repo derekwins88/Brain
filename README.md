@@ -28,20 +28,23 @@ Turn **harmonic entropy drift** into **machine-checkable Pâ‰ NP artifacts** in â
 - **Day-2 Sieve Capsule**  
   See: [SIEVE_DAY2](./capsules/SIEVE_DAY2.json)
 
-- **Day-3 Infographic (auto-rendered)**  
-  Output: [docs/day3_infographic.png](./docs/day3_infographic.png)  
-  Metadata: [docs/day3_infographic.json](./docs/day3_infographic.json) *(optional)*  
+- **Day-3 Infographic (auto-rendered)**
+  Output: [docs/day3_infographic.png](./docs/day3_infographic.png)
+  Metadata: [docs/day3_infographic.json](./docs/day3_infographic.json) *(optional)*
   Open in Colab: https://colab.research.google.com/github/derekwins88/Brain/blob/main/notebooks/render_infographic.ipynb
 
-> **Note:** CI runs the infographic notebook in **smoke mode** (`SMOKE=1`) to
-> produce a fast placeholder PNG. For the full render, open the notebook in
-> Colab or run locally without `SMOKE`:
->
-> ```bash
-> make render-day3
-> # or explicitly:
-> python -m nbconvert --to notebook --execute notebooks/render_infographic.ipynb
-> ```
+> **Tip:** On PRs, the infographic CI runs in **SMOKE** mode (skips strict JSON validation and allows soft notebook errors) so the PNG continues to refresh. On `main`, full validation is enforced.
+
+Local full check:
+```bash
+python -m nbconvert --to notebook --execute notebooks/render_infographic.ipynb --output /tmp/render_out.ipynb
+python - <<'PY'
+import json, jsonschema
+schema=json.load(open('schema/infographic.schema.json'))
+data=json.load(open('docs/day3_infographic.json'))
+jsonschema.validate(data, schema); print("JSON OK")
+PY
+```
 
 - **Day-4 Benchmark & Gallery**  
   Gallery page: [docs/gallery.html](./docs/gallery.html)  
