@@ -1,8 +1,12 @@
-[![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml)
-[![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml)
-[![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml)
-[![Proof v1.1 (smoke)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml)
-![Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg)
+<!-- Badges: add near your other CI badges -->
+![CI – Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)
+![CI – .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)
+![CI – Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg)
+![CI – Proof v1.1 (smoke)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg)
+![CI – Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg)
+![CI – Data](https://github.com/derekwins88/Brain/actions/workflows/ci-data.yml/badge.svg)
+![CI – Infographic](https://github.com/derekwins88/Brain/actions/workflows/auto_render_infographic.yml/badge.svg)
+![CI – Bench](https://github.com/derekwins88/Brain/actions/workflows/ci-bench.yml/badge.svg)
 
 **Status:** Day-1 green ✅ — Python, .NET, Lean4 build pass; Proof v1.1 pipeline smoke passes (PDF check is permissive until full translator is wired).
 
@@ -67,33 +71,31 @@ Notebook: github.com/derekwins88/Brain/blob/main/sieve.py
 #PvsNP #Lean4 #EntropyCollapse
 ```
 
+## Day-4: Benchmark & Gallery
 
-## Gallery
+- **Throughput bench (GPU↔CPU)**  
+  Runs a micro-benchmark on CuPy when available (falls back to NumPy), then plots ΔΦ trace throughput.  
+  **Chart:** [gallery/day4_bench.png](./gallery/day4_bench.png)
 
-- **Lean4 Green Check (Day-1)**  
-  ![lean4 green](docs/day1_lean.png)
+- **Capsule Gallery (auto-built)**  
+  Lists recent capsules (latest JSONs) and embeds the Day-4 chart.  
+  **Open:** [docs/gallery.html](./docs/gallery.html)
 
-- **Day-2 Sieve Capsule**  
-  See: [`SIEVE_DAY2`](capsules/SIEVE_DAY2.json)
-
-- **Day-3 Infographic (auto-rendered)**  
-  Output → **[docs/day3_infographic.png](docs/day3_infographic.png)**  
-  Metadata → **[docs/day3_infographic.json](docs/day3_infographic.json)**  
-  Open in Colab → **[render_infographic.ipynb](https://colab.research.google.com/github/derekwins88/Brain/blob/main/notebooks/render_infographic.ipynb)**
-
-_Re-render locally:_
+### Reproduce locally
 
 ```bash
-python -m nbconvert --to notebook --execute \
-  notebooks/render_infographic.ipynb \
-  --output /tmp/render_output.ipynb
+# 1) Bench (small/fast)
+python bench.py --traces 1_000_000 --mode cpu  -o out/bench_1M_cpu.csv
+python bench.py --traces 1_000_000 --mode auto -o out/bench_1M_auto.csv   # auto = GPU if present
+
+# 2) Plot chart from CSVs
+python plot_bench.py out/bench_*.csv -o gallery/day4_bench.png
+
+# 3) Build gallery page
+python gallery.py --capsules out/*.json --theme dark --out docs/gallery.html
 ```
 
-Or trigger the Auto-render infographic GitHub Action to refresh docs/day3_infographic.png automatically.
-
-> Tip: in Colab, **Runtime → Run all**. The notebook writes `docs/day3_infographic.png` back into the repo tree for an easy PR.
-
----
+CI: The “CI – Bench” job compiles Python, runs a small bench, renders gallery/day4_bench.png, builds docs/gallery.html, uploads them as artifacts, and (optionally) commits updates.
 
 ## Contributing
 
