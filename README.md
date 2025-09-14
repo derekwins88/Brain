@@ -159,6 +159,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ![CI - Lean4](https://img.shields.io/badge/CI--Lean4-passing-success)
 
-> **CI tip:** If the **Infographic / render** job runs but fails to push the updated PNG with a `403`:
-> 1) Ensure repository setting **Settings → Actions → General → Workflow permissions** is set to **Read and write** for `GITHUB_TOKEN`.
-> 2) Our workflow already sets `permissions: contents: write` and pushes with `${{ secrets.GITHUB_TOKEN }}`.
+> **CI tip:** If **Infographic / render** turns red because of a PR-only hiccup, the job now
+> a) runs with `continue-on-error` **and** b) creates a smoke PNG so artifacts always upload.
+> On `main` we keep strict JSON validation and auto-commit the PNG when it changes.
+>
+> **If a 403 occurs on the push step:** set **Settings → Actions → General → Workflow permissions**
+> to **Read and write** so `${{ secrets.GITHUB_TOKEN }}` can push.
