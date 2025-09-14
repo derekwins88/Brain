@@ -8,11 +8,16 @@
 ![auto_render_infographic](https://github.com/derekwins88/Brain/actions/workflows/auto_render_infographic.yml/badge.svg)
 ![CI - Bench](https://github.com/derekwins88/Brain/actions/workflows/ci-bench.yml/badge.svg)
 <!-- DOI badge placeholder; will activate after first Zenodo release -->
+
+**CI**
+
+- **Infographic / render**: PRs run in **SMOKE** mode via a small runner script that always produces a PNG
+  artifact (placeholder if JSON is missing). On `main`, the workflow tries to commit the refreshed PNG back to
+  the repo. If Actions **Workflow permissions** are **Read & write** and branch rules allow it, the bot push
+  succeeds; otherwise that final push step is allowed to fail gracefully so the badge stays green. The latest PNG
+  is always available as the run artifact.
+
 [![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)](#)
-> **Infographic CI note:** On PRs we run in SMOKE mode and always upload a PNG artifact.  
-> On `main`, the workflow will try to commit the refreshed PNG. If repo **Settings → Actions → Workflow permissions**
-> is set to **Read and write**, the bot push succeeds; if not (or if branch protection blocks it), the step is
-> allowed to fail gracefully and the workflow still passes. The latest PNG is always available as the run artifact.
 
 
 **Status:** Day-1 green ✅ — Python, .NET, Lean4 build pass; Proof v1.1 pipeline smoke passes (PDF check is permissive until full translator is wired).
