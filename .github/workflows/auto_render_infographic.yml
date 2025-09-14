@@ -1,12 +1,6 @@
 name: CI - Infographic / render
 
 on:
-  pull_request:
-    paths:
-      - "notebooks/render_infographic.ipynb"
-      - "schema/infographic.schema.json"
-      - "docs/day3_infographic.json"
-      - ".github/workflows/auto_render_infographic.yml"
   push:
     branches: [ "main" ]
     paths:
@@ -14,72 +8,100 @@ on:
       - "schema/infographic.schema.json"
       - "docs/day3_infographic.json"
       - ".github/workflows/auto_render_infographic.yml"
+  pull_request:
+    paths:
+      - "notebooks/render_infographic.ipynb"
+      - "schema/infographic.schema.json"
+      - "docs/day3_infographic.json"
+      - ".github/workflows/auto_render_infographic.yml"
   workflow_dispatch:
+
+# ✅ allow this workflow to write commits
+permissions:
+  contents: write
 
 jobs:
   render:
     runs-on: ubuntu-latest
-    env:
-      # PRs = SMOKE; main push/dispatch = strict
-      SMOKE: ${{ github.event_name != 'push' || github.ref != 'refs/heads/main' }}
+
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        # Use the ephemeral repo token for future pushes
+        token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
 
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install jupyter nbconvert jsonschema pillow matplotlib
+    - name: Install deps
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install jupyter nbconvert jsonschema matplotlib pillow
 
-      - name: Ensure folders
-        run: mkdir -p docs /tmp
+    - name: Ensure folders
+      run: mkdir -p docs out
 
-      # Run the notebook headlessly. In SMOKE mode we allow cell errors so we
-      # still get a fresh PNG even if optional data is missing.
-      - name: Execute notebook (SMOKE-aware)
-        run: |
-          if [ "${SMOKE}" = "true" ]; then
-            echo "SMOKE mode: allow notebook errors"
-            python -m nbconvert --to notebook --execute \
-              --ExecutePreprocessor.allow_errors=True \
-              --output /tmp/render_out.ipynb \
-              notebooks/render_infographic.ipynb
-          else
-            echo "STRICT mode: fail on notebook errors"
-            python -m nbconvert --to notebook --execute \
-              --output /tmp/render_out.ipynb \
-              notebooks/render_infographic.ipynb
-          fi
+    # PRs: smoke mode (don’t fail the build over notebook hiccups)
+    - name: Execute notebook (SMOKE-aware)
+      env:
+        SMOKE: ${{ github.event_name == 'pull_request' && '1' || '' }}
+      run: |
+        if [ -n "$SMOKE" ]; then
+          echo "Running in SMOKE mode"
+          python -m nbconvert --to notebook --execute \
+            --ExecutePreprocessor.allow_errors=True \
+            --output /tmp/render_out.ipynb notebooks/render_infographic.ipynb
+        else
+          python -m nbconvert --to notebook --execute \
+            --output /tmp/render_out.ipynb notebooks/render_infographic.ipynb
+        fi
 
-      # Optional JSON validation: only strict on main (SMOKE=false).
-      - name: Validate infographic JSON (strict on main)
-        run: |
-          if [ "${SMOKE}" = "true" ]; then
-            echo "SMOKE mode: skipping strict JSON validation"
-          else
-            python tools/validate_infographic.py schema/infographic.schema.json docs/day3_infographic.json
-          fi
+    - name: Validate infographic JSON (strict on main)
+      if: github.event_name != 'pull_request'
+      run: |
+        if [ -f docs/day3_infographic.json ]; then
+          python - <<'PY'
+import json, jsonschema, sys
+schema = json.load(open('schema/infographic.schema.json'))
+data   = json.load(open('docs/day3_infographic.json'))
+jsonschema.validate(data, schema)
+print("JSON OK")
+PY
+        else
+          echo "No docs/day3_infographic.json; skipping validation."
+        fi
 
-      - name: Upload PNG artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: day3-infographic-png
-          path: docs/day3_infographic.png
-          if-no-files-found: warn
+    - name: Upload PNG artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: day3-infographic-png
+        path: docs/day3_infographic.png
+        if-no-files-found: warn
 
-      - name: Commit updated PNG (main only, when changed)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/day3_infographic.png || true
-          if ! git diff --staged --quiet; then
-            git commit -m "chore(ci): auto-update day3 infographic"
-            git push
-          else
-            echo "No PNG changes to commit."
-          fi
+    # ✅ Push back only on main (PRs skip); use the GITHUB_TOKEN and explicit perms
+    - name: Commit updated PNG (main only, when changed)
+      if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: ${{ github.ref_name }}
+        REPO: ${{ github.repository }}
+      run: |
+        set -e
+        git config user.name  "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        # Stage and commit only if changed
+        git add docs/day3_infographic.png || true
+        if git diff --staged --quiet; then
+          echo "No PNG changes to commit."
+          exit 0
+        fi
+
+        git commit -m "chore(ci): auto-update day3 infographic"
+        # Push via token-auth URL to avoid 403
+        git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}" "HEAD:${BRANCH}"
+
