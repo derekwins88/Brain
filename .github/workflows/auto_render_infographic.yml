@@ -1,13 +1,18 @@
 name: CI - Infographic / render
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     paths:
       - "notebooks/render_infographic.ipynb"
-      - "docs/day3_infographic.json"
       - "schema/infographic.schema.json"
+      - "docs/day3_infographic.json"
+      - ".github/workflows/auto_render_infographic.yml"
+  push:
+    branches: [ "main" ]
+    paths:
+      - "notebooks/render_infographic.ipynb"
+      - "schema/infographic.schema.json"
+      - "docs/day3_infographic.json"
       - ".github/workflows/auto_render_infographic.yml"
   workflow_dispatch:
 
@@ -15,8 +20,8 @@ jobs:
   render:
     runs-on: ubuntu-latest
     env:
-      # PRs run in "SMOKE" mode (skip hard validation, allow notebook to render)
-      SMOKE: ${{ github.event_name == 'pull_request' && '1' || '0' }}
+      # PRs = SMOKE; main push/dispatch = strict
+      SMOKE: ${{ github.event_name != 'push' || github.ref != 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -28,35 +33,53 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          python -m pip install nbconvert nbclient jupyter jsonschema matplotlib pillow
+          python -m pip install jupyter nbconvert jsonschema pillow matplotlib
 
-      - name: Validate infographic JSON against schema (skipped in SMOKE)
-        if: env.SMOKE != '1'
+      - name: Ensure folders
+        run: mkdir -p docs /tmp
+
+      # Run the notebook headlessly. In SMOKE mode we allow cell errors so we
+      # still get a fresh PNG even if optional data is missing.
+      - name: Execute notebook (SMOKE-aware)
         run: |
-          if [ ! -f schema/infographic.schema.json ] || [ ! -f docs/day3_infographic.json ]; then
-            echo "Schema or JSON missing, skipping validation."
-            exit 0
+          if [ "${SMOKE}" = "true" ]; then
+            echo "SMOKE mode: allow notebook errors"
+            python -m nbconvert --to notebook --execute \
+              --ExecutePreprocessor.allow_errors=True \
+              --output /tmp/render_out.ipynb \
+              notebooks/render_infographic.ipynb
+          else
+            echo "STRICT mode: fail on notebook errors"
+            python -m nbconvert --to notebook --execute \
+              --output /tmp/render_out.ipynb \
+              notebooks/render_infographic.ipynb
           fi
-          python - <<'PY'
-import json, jsonschema, sys
-schema = json.load(open('schema/infographic.schema.json'))
-data   = json.load(open('docs/day3_infographic.json'))
-jsonschema.validate(data, schema)
-print("✅ JSON schema validation passed")
-PY
 
-      - name: Execute notebook (headless)
+      # Optional JSON validation: only strict on main (SMOKE=false).
+      - name: Validate infographic JSON (strict on main)
         run: |
-          # allow_errors keeps the PNG step alive in smoke situations
-          python -m nbconvert --to notebook --execute \
-            --ExecutePreprocessor.allow_errors=True \
-            notebooks/render_infographic.ipynb \
-            --output /tmp/render_output.ipynb
+          if [ "${SMOKE}" = "true" ]; then
+            echo "SMOKE mode: skipping strict JSON validation"
+          else
+            python tools/validate_infographic.py schema/infographic.schema.json docs/day3_infographic.json
+          fi
 
-      - name: Upload artifact
+      - name: Upload PNG artifact
         uses: actions/upload-artifact@v4
         with:
-          name: day3-infographic
-          path: |
-            docs/day3_infographic.png
-            docs/day3_infographic.json
+          name: day3-infographic-png
+          path: docs/day3_infographic.png
+          if-no-files-found: warn
+
+      - name: Commit updated PNG (main only, when changed)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/day3_infographic.png || true
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(ci): auto-update day3 infographic"
+            git push
+          else
+            echo "No PNG changes to commit."
+          fi
