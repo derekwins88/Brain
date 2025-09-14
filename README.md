@@ -9,6 +9,11 @@
 ![CI - Bench](https://github.com/derekwins88/Brain/actions/workflows/ci-bench.yml/badge.svg)
 <!-- DOI badge placeholder; will activate after first Zenodo release -->
 [![DOI](https://img.shields.io/badge/DOI-pending-lightgrey.svg)](#)
+> **Infographic CI note:** On PRs we run in SMOKE mode and always upload a PNG artifact.  
+> On `main`, the workflow will try to commit the refreshed PNG. If repo **Settings → Actions → Workflow permissions**
+> is set to **Read and write**, the bot push succeeds; if not (or if branch protection blocks it), the step is
+> allowed to fail gracefully and the workflow still passes. The latest PNG is always available as the run artifact.
+
 
 **Status:** Day-1 green ✅ — Python, .NET, Lean4 build pass; Proof v1.1 pipeline smoke passes (PDF check is permissive until full translator is wired).
 

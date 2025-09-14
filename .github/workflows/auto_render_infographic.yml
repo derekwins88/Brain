@@ -101,9 +101,11 @@ PY
         path: docs/day3_infographic.png
         if-no-files-found: warn
 
-    # ✅ Push back only on main (PRs skip); use the GITHUB_TOKEN and explicit perms
+    # ✅ Push back only on main (PRs skip). If token/branch rules block the push,
+    # don’t fail the job (badge stays green) – we already uploaded the artifact.
     - name: Commit updated PNG (main only, when changed)
       if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+      continue-on-error: true
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH: ${{ github.ref_name }}
@@ -112,15 +114,14 @@ PY
         set -e
         git config user.name  "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-        # Stage and commit only if changed
         git add docs/day3_infographic.png || true
         if git diff --staged --quiet; then
           echo "No PNG changes to commit."
           exit 0
         fi
-
         git commit -m "chore(ci): auto-update day3 infographic"
-        # Push via token-auth URL to avoid 403
-        git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}" "HEAD:${BRANCH}"
+        # Push via token-auth URL. If this 403s (permissions/branch rules), don’t fail the job.
+        if ! git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}" "HEAD:${BRANCH}"; then
+          echo "⚠️ Push skipped (likely branch protection or read-only token)."
+        fi
 
