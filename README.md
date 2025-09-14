@@ -33,8 +33,9 @@ Turn **harmonic entropy drift** into **machine-checkable Pâ‰ NP artifacts** in â
   Metadata: [docs/day3_infographic.json](./docs/day3_infographic.json) *(optional)*
   Open in Colab: https://colab.research.google.com/github/derekwins88/Brain/blob/main/notebooks/render_infographic.ipynb
 
-> **Tip:** On PRs, the infographic CI runs in **SMOKE** mode (skips strict JSON validation and allows soft notebook errors) so the PNG continues to refresh. On `main`, full validation is enforced.
-
+> **CI behavior:** On pull requests the *Infographic* job runs in **SMOKE** mode  
+> (renders the notebook and PNG even if optional metadata is missing).  
+> On `main`, strict JSON validation and hard-fail are enforced.
 Local full check:
 ```bash
 python -m nbconvert --to notebook --execute notebooks/render_infographic.ipynb --output /tmp/render_out.ipynb
