@@ -33,9 +33,8 @@ Turn **harmonic entropy drift** into **machine-checkable P≠NP artifacts** in �
   Metadata: [docs/day3_infographic.json](./docs/day3_infographic.json) *(optional)*
   Open in Colab: https://colab.research.google.com/github/derekwins88/Brain/blob/main/notebooks/render_infographic.ipynb
 
-> **CI behavior:** On pull requests the *Infographic* job runs in **SMOKE** mode  
-> (renders the notebook and PNG even if optional metadata is missing).  
-> On `main`, strict JSON validation and hard-fail are enforced.
+> **CI behavior:** On pull requests, the render job runs in **SMOKE** mode and uploads the PNG as an **artifact** only.
+> On `main`, JSON validation is strict and the PNG is **committed back** when it changes.
 Local full check:
 ```bash
 python -m nbconvert --to notebook --execute notebooks/render_infographic.ipynb --output /tmp/render_out.ipynb
@@ -159,3 +158,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 ## CI
 
 ![CI - Lean4](https://img.shields.io/badge/CI--Lean4-passing-success)
+
+> **CI tip:** If the **Infographic / render** job runs but fails to push the updated PNG with a `403`:
+> 1) Ensure repository setting **Settings → Actions → General → Workflow permissions** is set to **Read and write** for `GITHUB_TOKEN`.
+> 2) Our workflow already sets `permissions: contents: write` and pushes with `${{ secrets.GITHUB_TOKEN }}`.
