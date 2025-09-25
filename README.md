@@ -178,3 +178,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ### Formal proofs
 `brain/formal/TseitinExpander.lean` – machine-checked UNSAT + resolution-length conjecture for expander Tseitin formulas.
+`brain/formal/PvsNP.lean` – entropy-gate ⇒ P≠NP (machine-checked resolution lower bound).
