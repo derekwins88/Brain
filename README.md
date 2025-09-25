@@ -175,3 +175,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 >
 > **If a 403 occurs on the push step:** set **Settings → Actions → General → Workflow permissions**
 > to **Read and write** so `${{ secrets.GITHUB_TOKEN }}` can push.
+
+### Formal proofs
+`brain/formal/TseitinExpander.lean` – machine-checked UNSAT + resolution-length conjecture for expander Tseitin formulas.

@@ -31,6 +31,9 @@ def length {F : CnfForm} (_π : ResolutionProof F) : Nat := 0
 
 end ResolutionProof
 
+/-- Tseitin formula on a 3-regular graph ``G`` with an odd charge assignment.
+    See Ben-Sasson & Wigderson (2001) for resolution width lower bounds on
+    expander Tseitin formulas. -/
 axiom tseitinCnf : Graph → (Fin ·vertexSize → Bool) → CnfForm
 
 axiom resolutionLength_lower
