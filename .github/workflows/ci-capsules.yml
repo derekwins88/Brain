@@ -1,22 +1,102 @@
-name: CI - Capsules
-
+name: ci-capsules
 on:
   push:
-    branches: [main]
-
+    paths:
+      - "capsules/**"
+      - "schema/**"
+      - "python/validate_capsules.py"
+      - ".github/workflows/ci-capsules.yml"
+  pull_request:
+    paths:
+      - "capsules/**"
+      - "schema/**"
+      - "python/validate_capsules.py"
+      - ".github/workflows/ci-capsules.yml"
 jobs:
-  check-capsules:
+  validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
-
-      - name: Check for capsule files
-        continue-on-error: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
         run: |
-          if ls capsules/*.json >/dev/null 2>&1; then
-            echo "✅ Capsules detected:"
-            ls -1 capsules/*.json
-          else
-            echo "⚠️ No capsules found in /capsules (non-blocking)"
-            exit 0
-          fi
+          python -m pip install -U pip
+          python -m pip install jsonschema rfc3339-validator
+      - name: Validate capsules (with JSON summary)
+        run: |
+          python python/validate_capsules.py --json .capsules-summary/summary.json
+      - name: Upload summary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: capsules-summary
+          path: .capsules-summary/summary.json
+      - name: Comment on PR with results
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const core = require('@actions/core');
+            const path = '.capsules-summary/summary.json';
+            let data = {validated: [], ignored: [], invalid_total: 0, schema: ''};
+            try {
+              data = JSON.parse(fs.readFileSync(path, 'utf8'));
+            } catch (e) {
+              core.warning('No summary JSON found; skipping comment.');
+              return;
+            }
+
+            const makeRow = (v) => {
+              const status = v.status === 'ok' ? '✅' : '❌';
+              const issues = v.messages && v.messages.length
+                ? v.messages.map(m => `- ${m}`).join('\n')
+                : '';
+              return `| \`${v.file}\` | ${status} | ${issues} |`;
+            };
+
+            const rows = data.validated.length
+              ? data.validated.map(makeRow).join('\n')
+              : '| _none_ | ✅ | |';
+
+            const ignored = (data.ignored || []).map(f => `- \`${f}\``).join('\n') || '_none_';
+
+            const header = '<!-- CAPSULE-REPORT:BEGIN -->';
+            const footer = '<!-- CAPSULE-REPORT:END -->';
+            const title = '### 🧪 Capsules Validation Report';
+            const invalid = data.invalid_total || 0;
+            const overall = invalid === 0 ? '✅ **All capsules valid**' : `❌ **${invalid} invalid capsule(s)**`;
+
+            const body = `
+            ${header}
+            ${title}
+
+            ${overall}
+
+            **Schema:** \`${data.schema}\`
+
+            | File | Status | Issues |
+            |---|:---:|---|
+            ${rows}
+
+            <details><summary>Ignored files</summary>
+
+            ${ignored}
+
+            </details>
+            ${footer}
+            `.trim();
+
+            const {owner, repo} = context.repo;
+            const issue_number = context.issue.number;
+            const list = await github.rest.issues.listComments({owner, repo, issue_number, per_page: 100});
+            const mine = list.data.find(c => c.user.type === 'Bot' && c.body && c.body.includes('CAPSULE-REPORT:BEGIN'));
+            if (mine) {
+              await github.rest.issues.updateComment({owner, repo, comment_id: mine.id, body});
+            } else {
+              await github.rest.issues.createComment({owner, repo, issue_number, body});
+            }

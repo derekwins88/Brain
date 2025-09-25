@@ -15,7 +15,7 @@ import os, datetime as dt, json, pathlib
 SMOKE = os.getenv("SMOKE", "0") == "1"
 OUT_PNG = pathlib.Path("docs/day3_infographic.png")
 OUT_JSON = pathlib.Path("docs/day3_infographic.json")
-CAP_JSON = pathlib.Path("capsules/SIEVE_DAY2.json")
+CAP_JSON = pathlib.Path("capsules/sieve-day2.json")
 
 def utc_now_z():
     return dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
@@ -27,7 +27,7 @@ if SMOKE:
     d = PIL.ImageDraw.Draw(img)
     d.text((40, 40), "Day-3 Infographic (SMOKE)", fill=(235,235,235))
     d.text((40,120), f"Timestamp: {utc_now_z()}", fill=(180,180,180))
-    d.text((40,170), "Source: capsules/SIEVE_DAY2.json (if present)", fill=(180,180,180))
+    d.text((40,170), "Source: capsules/sieve-day2.json (if present)", fill=(180,180,180))
     img.save(OUT_PNG)
 
     meta = {

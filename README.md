@@ -36,7 +36,7 @@ Turn **harmonic entropy drift** into **machine-checkable P≠NP artifacts** in �
   Output: `docs/day1_lean.png`
 
 - **Day-2 Sieve Capsule**  
-  See: [SIEVE_DAY2](./capsules/SIEVE_DAY2.json)
+  See: [sieve-day2](./capsules/sieve-day2.json)
 
 - **Day-3 Infographic (auto-rendered)**
   Output: [docs/day3_infographic.png](./docs/day3_infographic.png)
@@ -73,7 +73,7 @@ PY
 – Capsule metadata and seed file (entropy thresholds, provenance) strengthen the statement.  
 
 See: [lean4_pnp.lean](./lean4_pnp.lean)
-Capsule: [IMM_MATH_ALSTEIN01](./capsules/IMM_MATH_ALSTEIN01.json)
+Capsule: [imm-math-alstein01](./capsules/imm-math-alstein01.json)
 
 ## Day-2: GPU Entropy Sieve ✅
 
@@ -91,7 +91,7 @@ N_TRACES=10000000 TRACE_LEN=64 CSV_PATH=data/entropy_sieve_10m.csv python3 sieve
 
 ```
 
-Day-2 capsule: [SIEVE_DAY2](./capsules/SIEVE_DAY2.json)
+Day-2 capsule: [sieve-day2](./capsules/sieve-day2.json)
 
 Colab
 **Colab Open:** [sieve.ipynb](https://colab.research.google.com/github/derekwins88/Brain/blob/main/sieve.ipynb)
@@ -179,3 +179,30 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 ### Formal proofs
 `brain/formal/TseitinExpander.lean` – machine-checked UNSAT + resolution-length conjecture for expander Tseitin formulas.
 `brain/formal/PvsNP.lean` – entropy-gate ⇒ P≠NP (machine-checked resolution lower bound).
+
+## Notes / Docs heartbeat
+<p align="left">
+  <a href="https://github.com/derekwins88/Brain/actions/workflows/docs-notes.yml">
+    <img alt="Docs (notes)" src="https://img.shields.io/github/actions/workflow/status/derekwins88/Brain/docs-notes.yml?label=Docs%20(notes)&logo=github">
+  </a>
+  <a href="https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml">
+    <img alt="Capsules" src="https://img.shields.io/github/actions/workflow/status/derekwins88/Brain/ci-capsules.yml?label=Capsules&logo=github">
+  </a>
+</p>
+
+**Scope:** This repo is a research notebook for a “closeness/structure” lens on P vs NP. \
+Artifacts under `docs/` are **working outputs** (not proofs). The notes workflow renders a
+single PDF (`docs/Brain.pdf`) and a high-level Mermaid diagram (`docs/diagrams/system.svg`)
+so reviewers always have something concrete to open.
+
+### Validate capsules locally
+```bash
+python -m pip install -U jsonschema rfc3339-validator
+python python/validate_capsules.py
+```
+The script validates all `capsules/*.json` against `schema/capsule.schema.json` and prints a summary.
+Files are ignored if they are templates or JSONC:
+- `capsules/_*.json` (e.g. `_template.json`)
+- `capsules/*.jsonc` (commented JSON templates)
+
+On Pull Requests, CI also posts (and updates) a **Capsules Validation Report** comment with a pass/fail table.

@@ -1,18 +1,35 @@
 {
-  "capsule_id": "TseitinExpander_n60",
-  "SchemaVersion": "capsule-1.1.0",
-  "family": "TseitinExpander",
-  "parameter": 60,
-  "Claim": "OPEN",
-  "Metadata": {
-    "np_wall": true,
-    "no_recovery": false,
-    "sat_result": false,
-    "sat_provenance": {
-      "mode": "synthetic",
-      "binary": "tseitin-charge"
-    },
-    "drat_sha256": "2df33b6f380a9afc179681524775d634a87eb9b3b6983e74b3f3d1ee6dd427ce",
-    "lean_theorem": "TseitinExpander.cnf60_unsat"
+  "id": "tseitin-expander-n60",
+  "kind": "capsule",
+  "title": "Tseitin expander n=60 — UNSAT witness capsule",
+  "assumptions": [
+    "A0: Standard complexity foundations",
+    "A1: Tseitin expander CNF (n = 60) encodes the charge instance"
+  ],
+  "claim": "Open capsule documenting the UNSAT witness metadata for the Tseitin expander (n=60) instance.",
+  "context": {
+    "refs": [
+      "capsules/tseitin_n60.cnf",
+      "capsules/tseitin_n60.drat",
+      "brain/formal/TseitinExpander.lean"
+    ],
+    "notes": "DRAT SHA-256: 2df33b6f380a9afc179681524775d634a87eb9b3b6983e74b3f3d1ee6dd427ce. Lean theorem: TseitinExpander.cnf60_unsat."
+  },
+  "status": "draft",
+  "version": "0.1.0",
+  "created": "2025-09-25T01:35:13-07:00",
+  "updated": "2025-09-25T01:35:13-07:00",
+  "authors": [
+    { "name": "Derek Wins" }
+  ],
+  "provenance": {
+    "derivedFrom": [
+      "capsules/tseitin_n60.drat",
+      "brain/formal/TseitinExpander.lean"
+    ],
+    "tools": [
+      "drat-trim",
+      "lean4"
+    ]
   }
 }

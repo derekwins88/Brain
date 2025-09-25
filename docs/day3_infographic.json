@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "title": "Entropy Sieve – Day 3 Snapshot",
-  "subtitle": "Live metrics from SIEVE_DAY2 + static fallback",
+  "subtitle": "Live metrics from sieve-day2 + static fallback",
   "metrics": {
     "np_wall_pct": 3.7,
     "thresholds": { "np": 0.09, "p": 0.045 },

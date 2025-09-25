@@ -1,0 +1,35 @@
+{
+  "id": "sieve-day2",
+  "kind": "capsule",
+  "title": "Day-2 GPU Entropy Sieve — Summary",
+  "assumptions": [
+    "A0: Standard complexity foundations",
+    "A1: Entropy sieve heuristics approximate NP-wall detection"
+  ],
+  "claim": "Open capsule summarizing the Day-2 GPU entropy sieve metrics (non-proof diagnostic).",
+  "context": {
+    "refs": [
+      "notes/index.md",
+      "data/entropy_sieve_ci.json",
+      "data/entropy_sieve_ci.csv"
+    ],
+    "notes": "Trace length 48 across 20k samples (CPU backend). NP hits: 688 (3.44%). Thresholds — P: 0.045, NP: 0.09."
+  },
+  "status": "draft",
+  "version": "0.1.0",
+  "created": "2025-09-10T22:25:41-07:00",
+  "updated": "2025-09-10T22:25:41-07:00",
+  "authors": [
+    { "name": "Derek Wins" }
+  ],
+  "provenance": {
+    "derivedFrom": [
+      "data/entropy_sieve_ci.json",
+      "data/entropy_sieve_ci.csv"
+    ],
+    "tools": [
+      "entropy-sieve",
+      "python"
+    ]
+  }
+}
