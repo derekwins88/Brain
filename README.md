@@ -1,4 +1,7 @@
 <!-- Badges row -->
+[![docs](https://github.com/derekwins88/Brain/actions/workflows/mdbook.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/mdbook.yml)
+**Live Docs:** https://derekwins88.github.io/Brain/
+
 ![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)
 ![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)
 ![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg)

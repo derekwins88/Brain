@@ -1,0 +1,19 @@
+[book]
+title = "Brain — Closeness Capsules"
+description = "Structured, auditable notes and capsules (P vs NP adjacent)."
+authors = ["Derek (and friendly robots)"]
+language = "en"
+multilingual = false
+src = "src"
+
+[output.html]
+default-theme = "ayu"
+git-repository-url = "https://github.com/derekwins88/Brain"
+additional-css = ["theme/overrides.css"]
+
+[preprocessor.mermaid]
+# Requires mdbook-mermaid installed (CI installs it)
+
+# Optional future niceties (safe to keep commented until used)
+# [preprocessor.sitemap]
+# base-url = "https://derekwins88.github.io/Brain/"
