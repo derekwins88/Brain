@@ -60,7 +60,12 @@ def _cycle_with_matching_edges(n: int) -> Tuple[Tuple[int, int], ...]:
 
 
 def expander_graph(n: int) -> RegularGraph:
-    """Return a deterministic 3-regular expander-like graph on ``n`` vertices."""
+    """Return a deterministic 3-regular expander-like graph on ``n`` vertices.
+
+    The cycle-plus-matching circulant construction appears in many expander
+    surveys; see Hoory-Linial-Wigderson (2006, §2) for background on its edge
+    expansion guarantees.
+    """
 
     edges = _cycle_with_matching_edges(n)
     return RegularGraph(num_vertices=n, edges=edges)
