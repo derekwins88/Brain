@@ -1,0 +1,19 @@
+{
+  "id": "brain-demo-0001",
+  "kind": "capsule",
+  "title": "Structure/Closeness sketch (demo)",
+  "assumptions": ["A0: standard complexity foundations"],
+  "claim": "Non-proof capsule: records a structured statement for audit.",
+  "context": { "refs": ["notes/index.md"] },
+  "status": "draft",
+  "version": "0.1.0",
+  "created": "2025-09-25T00:00:00Z",
+  "updated": "2025-09-25T00:00:00Z",
+  "authors": [
+    { "name": "Derek Wins" }
+  ],
+  "provenance": {
+    "derivedFrom": ["notes/system.mmd"],
+    "tools": ["pandoc", "mermaid-cli"]
+  }
+}

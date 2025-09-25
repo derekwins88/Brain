@@ -16,3 +16,19 @@ repos:
         args:
           - --set-formats=ipynb,py:percent
           - --sync
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: validate-capsules
+        name: validate capsules
+        entry: python python/validate_capsules.py
+        language: system
+        files: ^capsules/.*\.json$
+        exclude: ^capsules/_.*\.json$
+        pass_filenames: false

@@ -1,0 +1,11 @@
+flowchart LR
+  subgraph Authoring
+    A1[Markdown Notes] --> A2[Extract key definitions]
+    A2 --> A3[Capsule JSON]
+  end
+  subgraph Build
+    A3 --> B1[Mermaid render]
+    A1 --> B2[PDF compile]
+  end
+  B1 --> C[docs/]
+  B2 --> C

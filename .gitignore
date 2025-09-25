@@ -6,3 +6,6 @@ bin/
 obj/
 .DS_Store
 .env
+node_modules/
+docs/Brain.pdf
+docs/diagrams/system.svg

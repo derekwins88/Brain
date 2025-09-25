@@ -1,0 +1,32 @@
+{
+  "id": "imm-math-alstein01",
+  "kind": "capsule",
+  "title": "Entropy Curvature Threshold (Alstein Frame) — Seed",
+  "assumptions": [
+    "A0: Standard complexity foundations",
+    "A1: Entropy curvature lens applies to the Alstein frame"
+  ],
+  "claim": "Open capsule tracking entropy curvature thresholds for the Alstein frame seed instance.",
+  "context": {
+    "refs": [
+      "notes/index.md",
+      "lean4_pnp.lean"
+    ],
+    "notes": "Entropy series: [0.042, 0.051, …, 0.044]. Thresholds — P: 0.045, NP: 0.09. Captured from unit-contradiction sweeps."
+  },
+  "status": "draft",
+  "version": "0.1.0",
+  "created": "2025-09-10T17:04:06-07:00",
+  "updated": "2025-09-10T17:04:06-07:00",
+  "authors": [
+    { "name": "Derek Wins" }
+  ],
+  "provenance": {
+    "derivedFrom": [
+      "lean4_pnp.lean"
+    ],
+    "tools": [
+      "unit-contradiction heuristic"
+    ]
+  }
+}

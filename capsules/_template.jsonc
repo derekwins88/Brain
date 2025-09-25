@@ -1,0 +1,32 @@
+// Capsule template (JSONC format with comments). Copy to
+//   capsules/<your-id>.json
+// and remove comments before committing.
+{
+  "id": "brain-demo-0002",          // kebab-case, stable identifier
+  "kind": "capsule",               // must be "capsule"
+  "title": "Short descriptive title",
+  "assumptions": [
+    "A0: standard complexity assumptions"
+  ],
+  "claim": "Your main statement here.",
+  "context": {
+    "refs": ["notes/index.md"],    // one or more references
+    "notes": "Optional explanatory text"
+  },
+  "status": "draft",               // draft | frozen | superseded
+  "version": "0.1.0",              // semantic version
+  "created": "2025-09-25T00:00:00Z", // RFC3339 timestamp
+  "updated": "2025-09-25T00:00:00Z",
+  "authors": [
+    {
+      "name": "Your Name",
+      "email": "you@example.com",   // optional
+      "orcid": "0000-0002-1825-0097"// optional
+    }
+  ],
+  "provenance": {
+    "derivedFrom": [],              // list of capsule ids or refs
+    "tools": []                     // list of tools used, if any
+  },
+  "hash": ""                        // optional SHA-256 of content
+}
