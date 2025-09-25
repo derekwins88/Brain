@@ -1,0 +1,18 @@
+{
+  "capsule_id": "TseitinExpander_n60",
+  "SchemaVersion": "capsule-1.1.0",
+  "family": "TseitinExpander",
+  "parameter": 60,
+  "Claim": "OPEN",
+  "Metadata": {
+    "np_wall": true,
+    "no_recovery": false,
+    "sat_result": false,
+    "sat_provenance": {
+      "mode": "synthetic",
+      "binary": "tseitin-charge"
+    },
+    "drat_sha256": "2df33b6f380a9afc179681524775d634a87eb9b3b6983e74b3f3d1ee6dd427ce",
+    "lean_theorem": "TseitinExpander.cnf60_unsat"
+  }
+}
