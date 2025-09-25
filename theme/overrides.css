@@ -1,0 +1,4 @@
+/* Tiny polish — readable code blocks and slightly tighter layout */
+code, pre { font-size: 0.95rem; }
+.markdown-section { max-width: 900px; }
+.markdown-section a:focus { outline: 2px dashed; outline-offset: 2px; }
