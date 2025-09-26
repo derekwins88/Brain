@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Lean toolchain
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | bash -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+          ~/.elan/bin/elan toolchain link default "$(cat lean/lean-toolchain)"
       - uses: leanprover/lean-action@v1
         with:
           project: brain/formal
