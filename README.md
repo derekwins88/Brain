@@ -1,15 +1,15 @@
 <!-- Badges row -->
-[![docs](https://github.com/derekwins88/Brain/actions/workflows/mdbook.yml/badge.svg)](https://github.com/derekwins88/Brain/actions/workflows/mdbook.yml)
+[![docs](https://github.com/derekwins88/Brain/actions/workflows/mdbook.yml/badge.svg?branch=main)](https://github.com/derekwins88/Brain/actions/workflows/mdbook.yml)
 **Live Docs:** https://derekwins88.github.io/Brain/
 
-![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)
-![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)
-![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg)
-![CI - Proof v1.1 (smoke)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg)
-![CI - Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg)
-![CI - Data](https://github.com/derekwins88/Brain/actions/workflows/ci-data.yml/badge.svg)
-![auto_render_infographic](https://github.com/derekwins88/Brain/actions/workflows/auto_render_infographic.yml/badge.svg)
-![CI - Bench](https://github.com/derekwins88/Brain/actions/workflows/ci-bench.yml/badge.svg)
+![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg?branch=main)
+![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg?branch=main)
+![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg?branch=main)
+![CI - Proof v1.1 (smoke)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg?branch=main)
+![CI - Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg?branch=main)
+![CI - Data](https://github.com/derekwins88/Brain/actions/workflows/ci-data.yml/badge.svg?branch=main)
+![auto_render_infographic](https://github.com/derekwins88/Brain/actions/workflows/auto_render_infographic.yml/badge.svg?branch=main)
+![CI - Bench](https://github.com/derekwins88/Brain/actions/workflows/ci-bench.yml/badge.svg?branch=main)
 <!-- DOI badge placeholder; will activate after first Zenodo release -->
 
 **CI**
@@ -65,11 +65,11 @@ PY
 
 ## Day-1: Lean4 Proof Scaffold ✅
 
-![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg)
-![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg)
-![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg)
-![CI - Proof](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg)
-![CI - Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg)
+![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg?branch=main)
+![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg?branch=main)
+![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg?branch=main)
+![CI - Proof](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg?branch=main)
+![CI - Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg?branch=main)
 
 – Encodes the NP-wall & no-recovery gates as predicates.  
 – Returns `True` (via `sorry`) so it compiles cleanly.  
@@ -80,7 +80,7 @@ Capsule: [imm-math-alstein01](./capsules/imm-math-alstein01.json)
 
 ## Day-2: GPU Entropy Sieve ✅
 
-![CI - Data](https://github.com/derekwins88/Brain/actions/workflows/ci-data.yml/badge.svg)
+![CI - Data](https://github.com/derekwins88/Brain/actions/workflows/ci-data.yml/badge.svg?branch=main)
 
 We added a GPU-accelerated sieve (`sieve.py`) that scans entropy traces and flags irreversible spikes above the NP threshold (ΔΦ > 0.09). It auto-selects CUDA (CuPy) when available and falls back to CPU (NumPy).
 
