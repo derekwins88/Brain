@@ -10,7 +10,7 @@ namespace ExpanderTseitin
 structure ExpanderGraph (n : ℕ) where
   simpleGraph : SimpleGraph (Fin n)
   regular     : ∀ v, simpleGraph.degree v = 3
-  expansion   : simpleGraph.edgeExpander ≥ 5 / 10
+  expansion   : simpleGraph.edgeExpansion ≥ 5 / 10
 
 /-- Tseitin CNF with odd charge -/
 def tseitinCnf {n} (G : ExpanderGraph n) : CnfForm :=
