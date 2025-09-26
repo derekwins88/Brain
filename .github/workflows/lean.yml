@@ -1,24 +1,38 @@
 name: Lean 4 Proof Check
-
 on:
   push:
     branches: [ main ]
+    paths: [ 'lean/**', '.github/workflows/lean.yml' ]
   pull_request:
-    branches: [ main ]
+    paths: [ 'lean/**', '.github/workflows/lean.yml' ]
 
 jobs:
   lean:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Lean toolchain
+
+      - name: Install Elan (Lean toolchain)
         run: |
           curl -fsSL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | bash -s -- -y
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
           TOOLCHAIN="$(cat lean/lean-toolchain)"
           ~/.elan/bin/elan toolchain install "$TOOLCHAIN"
           ~/.elan/bin/elan default "$TOOLCHAIN"
-      - uses: leanprover/lean-action@v1
+
+      - name: Cache Lake deps
+        uses: actions/cache@v4
         with:
-          project: brain/formal
-          args: lake build PvsNP
+          path: |
+            ~/.elan
+            ~/.lake
+          key: ${{ runner.os }}-lake-${{ hashFiles('lean/lakefile.lean', 'lean/lake-manifest.json') }}
+          restore-keys: ${{ runner.os }}-lake-
+
+      - name: lake update (generates lake-manifest.json)
+        working-directory: lean
+        run: lake update
+
+      - name: lake build
+        working-directory: lean
+        run: lake build

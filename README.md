@@ -4,7 +4,7 @@
 
 ![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg?branch=main)
 ![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg?branch=main)
-![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg?branch=main)
+![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/lean.yml/badge.svg?branch=main)
 ![CI - Proof v1.1 (smoke)](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg?branch=main)
 ![CI - Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg?branch=main)
 ![CI - Data](https://github.com/derekwins88/Brain/actions/workflows/ci-data.yml/badge.svg?branch=main)
@@ -67,7 +67,7 @@ PY
 
 ![CI - Python](https://github.com/derekwins88/Brain/actions/workflows/ci-python.yml/badge.svg?branch=main)
 ![CI - .NET](https://github.com/derekwins88/Brain/actions/workflows/ci-dotnet.yml/badge.svg?branch=main)
-![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/ci-lean.yml/badge.svg?branch=main)
+![CI - Lean4](https://github.com/derekwins88/Brain/actions/workflows/lean.yml/badge.svg?branch=main)
 ![CI - Proof](https://github.com/derekwins88/Brain/actions/workflows/ci-proof.yml/badge.svg?branch=main)
 ![CI - Capsules](https://github.com/derekwins88/Brain/actions/workflows/ci-capsules.yml/badge.svg?branch=main)
 
