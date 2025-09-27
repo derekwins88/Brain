@@ -1,4 +1,5 @@
 name: docs
+
 on:
   push:
     branches: [ main ]
@@ -10,6 +11,15 @@ on:
       - '.github/workflows/mdbook.yml'
       - 'README.md'
   workflow_dispatch:
+    inputs:
+      build_only:
+        description: "Run build + logs, skip deploy"
+        required: false
+        default: "false"
+      extra_verbose:
+        description: "Turn on shell xtrace + extended diagnostics"
+        required: false
+        default: "true"
 
 permissions:
   contents: read
@@ -20,11 +30,31 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  MDBOOK_VER: "0.4.40"
+  MERMAID_VER: "0.13.0"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug · env + versions
+        id: envinfo
+        run: |
+          set -euo pipefail
+          echo "uname -a: $(uname -a)"
+          echo "runner OS: $RUNNER_OS"
+          echo "pwd: $(pwd)"
+          echo "tree (top):"
+          ls -la
+          echo "-----------"
+          echo "Inputs: build_only='${{ github.event.inputs.build_only || 'false' }}' extra_verbose='${{ github.event.inputs.extra_verbose || 'true' }}'"
+
+      - name: Enable xtrace (optional)
+        if: ${{ github.event.inputs.extra_verbose == 'true' }}
+        run: echo "set -x" >> $GITHUB_STEP_SUMMARY
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -36,18 +66,65 @@ jobs:
             ~/.cargo/bin
             ~/.cargo/registry
             ~/.cargo/git
-          key: ${{ runner.os }}-mdbook-${{ hashFiles('book.toml') }}-${{ hashFiles('src/**') }}
+          key: ${{ runner.os }}-mdbook-${{ env.MDBOOK_VER }}-${{ hashFiles('book.toml') }}-${{ hashFiles('src/**') }}
           restore-keys: ${{ runner.os }}-mdbook-
 
-      - name: Build docs (Makefile, pinned tools)
-        run: make docs
+      - name: Pin mdBook tools (also used by Makefile)
+        run: |
+          set -euxo pipefail
+          cargo install mdbook --version "${MDBOOK_VER}" --locked || true
+          cargo install mdbook-mermaid --version "${MERMAID_VER}" --locked || true
+          mdbook --version
+          mdbook-mermaid --version || true
 
-      - name: Upload artifact
+      - name: Workspace preview
+        run: |
+          echo "book.toml:"
+          sed -n '1,200p' book.toml || true
+          echo "SUMMARY.md:"
+          sed -n '1,200p' src/SUMMARY.md || true
+
+      - name: Build docs (verbose)
+        id: build
+        run: |
+          set -euxo pipefail
+          # Prefer your Makefile so local == CI
+          make docs
+          # Extra verbose pass to capture logs as needed
+          mdbook build -v | tee mdbook-build.log
+
+      - name: Validate artifact contents
+        id: validate
+        run: |
+          set -euo pipefail
+          if [ ! -d "book" ]; then
+            echo "❌ book/ directory missing after build"
+            exit 66
+          fi
+          echo "✅ book/ exists"
+          find book -maxdepth 2 -type f | head -n 200
+          du -sh book || true
+
+      - name: Upload debug logs (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-debug-logs
+          path: |
+            mdbook-build.log
+            book/index.html
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload Pages artifact
+        if: ${{ github.event.inputs.build_only != 'true' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./book
+          name: github-pages   # explicit; used by deploy job
 
   deploy:
+    if: ${{ github.event.inputs.build_only != 'true' }}
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -56,3 +133,5 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages
