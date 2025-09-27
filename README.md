@@ -25,6 +25,53 @@
 
 **Status:** Day-1 green ✅ — Python, .NET, Lean4 build pass; Proof v1.1 pipeline smoke passes (PDF check is permissive until full translator is wired).
 
+## Movement: Formal Proof Pipeline (Capsule → Lean)
+
+This repo is moving toward a **machine-checked** proof workflow:
+
+1. **Collect capsules** (`capsules/*.json`, schema v1.1): ΔΦ (as integers), DRAT flags, CNF/DRAT hashes.
+2. **Generate Lean facts**: `python scripts/gen_capsule_cert.py capsules/ lean/Brain/Proof/GridCert.lean 90`.
+3. **Compile & check**: `lake build` builds a **K-witness theorem** (computational, no floats).
+4. **Reduction work** lives in `lean/Brain/Market/TseitinParity.lean` (skeleton now, to be proved).
+
+**Why this matters:** it separates
+- *engineering evidence* (instance-level DRAT + metrics) from
+- *mathematics* (family-level reduction lemmas),
+
+so we can iterate honestly toward formal results without over-claiming.
+
+---
+
+How to run locally
+
+```bash
+# from repo root
+python scripts/gen_capsule_cert.py capsules/examples lean/Brain/Proof/GridCert.lean 90
+lake update
+lake build
+```
+
+You should see:
+
+```
+K-witness theorem compiled. THRESH=90 OK.
+```
+
+---
+
+What this enables next
+- Add your ~50 capsules to capsules/ → re-run the generator → CI will produce a Lean-checked cohort theorem instantly.
+- Start filling in Market/TseitinParity.lean with your formal reduction (no data, no floats).
+- If you want, we can add a tiny DRAT hash verifier hook next so CI asserts the proofs correspond to the CNF hashes you logged.
+
+If you want me to push this as an actual PR branch name, use:
+
+feat/proof-pipeline-v1
+
+and I’ll format the PR message accordingly.
+
+—The Caretaker
+
 # Day-0 Mission
 
 Turn **harmonic entropy drift** into **machine-checkable P≠NP artifacts** in ≤ 30 days.
