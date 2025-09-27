@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Proof Capsule v1.1",
+  "type": "object",
+  "required": ["capsule_id","timestamp","ΔΦ_milli","passed_drat","cnf_sha256","drat_sha256","n_vars","n_clauses"],
+  "properties": {
+    "capsule_id": {"type":"string"},
+    "timestamp": {"type":"string"},
+    "ΔΦ_milli": {
+      "type": "integer",
+      "minimum": 0,
+      "$comment": "e.g., 94 instead of 0.094"
+    },
+    "passed_drat": {"type":"boolean"},
+    "cnf_sha256": {"type":"string"},
+    "drat_sha256": {"type":"string"},
+    "n_vars": {"type":"integer","minimum":1},
+    "n_clauses": {"type":"integer","minimum":1},
+    "tseitin_family_id": {"type":"string"},
+    "regime": {"type":"string","enum":["SAT","UNSAT","UNKNOWN"]},
+    "meta": {"type":"object"}
+  }
+}

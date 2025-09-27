@@ -1,0 +1,13 @@
+{
+  "capsule_id": "market-nphard-2025-03-21T16:30:00Z",
+  "timestamp": "2025-03-21T16:30:00Z",
+  "ΔΦ_milli": 94,
+  "passed_drat": true,
+  "cnf_sha256": "sha256-deadbeef...",
+  "drat_sha256": "sha256-cafebabe...",
+  "n_vars": 1200,
+  "n_clauses": 2400,
+  "tseitin_family_id": "ramanujan-40b",
+  "regime": "UNSAT",
+  "meta": { "window":"40-bar", "note":"demo" }
+}

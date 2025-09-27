@@ -10,3 +10,4 @@ node_modules/
 docs/Brain.pdf
 docs/diagrams/system.svg
 book/
+lean/Brain/Proof/GridCert.lean

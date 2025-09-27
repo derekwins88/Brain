@@ -1,22 +1,28 @@
-name: CI - Proof v1.1 (smoke)
-on: [push, pull_request]
-
+name: proof-ci
+on:
+  push: { branches: ["**"] }
+  pull_request: {}
 jobs:
-  proof-smoke:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Python setup
+      - name: Set up Python
         uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+
+      - name: Generate Lean GridCert
+        run: |
+          python scripts/gen_capsule_cert.py capsules/examples lean/Brain/Proof/GridCert.lean 90
+
+      - name: Set up Lean
+        uses: leanprover/lean-action@v1
         with:
-          python-version: "3.11"
+          use-cache: true
+          allow-sorry: true
 
-      - name: Install deps
+      - name: Build (Lake)
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install pypdf
-
-      - name: Run proof v1.1 smoke
-        run: |
-          python tools/proof_v1_1_smoke.py
+          lake update
+          lake build
