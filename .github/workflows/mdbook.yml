@@ -6,12 +6,13 @@ on:
       - 'book.toml'
       - 'src/**'
       - 'theme/**'
+      - 'Makefile'
       - '.github/workflows/mdbook.yml'
       - 'README.md'
   workflow_dispatch:
 
 permissions:
-  contents: read     # build only needs read
+  contents: read
   pages: write
   id-token: write
 
@@ -36,33 +37,15 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: ${{ runner.os }}-mdbook-${{ hashFiles('book.toml') }}-${{ hashFiles('src/**') }}
+          restore-keys: ${{ runner.os }}-mdbook-
 
-      - name: Install mdBook + Mermaid (pinned)
-        run: |
-          cargo install mdbook --version 0.4.40 --locked || true
-          cargo install mdbook-mermaid --version 0.13.0 --locked || true
-
-      - name: Build book
-        run: mdbook build
+      - name: Build docs (Makefile, pinned tools)
+        run: make docs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./book
-
-  # Optional quick link-check (non-blocking)
-  linkcheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - name: mdbook-linkcheck
-        continue-on-error: true
-        run: |
-          cargo install mdbook --version 0.4.40 --locked || true
-          cargo install mdbook-linkcheck --version 0.7.7 --locked || true
-          mdbook build -d book
-          mdbook-linkcheck
 
   deploy:
     needs: build
