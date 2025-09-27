@@ -12,8 +12,7 @@ git-repository-url = "https://github.com/derekwins88/Brain"
 additional-css = ["theme/overrides.css"]
 
 [preprocessor.mermaid]
-# Requires mdbook-mermaid installed (CI installs it)
 
-# Optional future niceties (safe to keep commented until used)
-# [preprocessor.sitemap]
-# base-url = "https://derekwins88.github.io/Brain/"
+# Optional but nice: only takes effect if mdbook-sitemap is installed
+[preprocessor.sitemap]
+base-url = "https://derekwins88.github.io/Brain/"
